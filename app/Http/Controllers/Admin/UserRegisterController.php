@@ -37,13 +37,12 @@ class UserRegisterController extends Controller
             'password'  => 'required|min:6',
             'phone'     => 'nullable|string|max:20',
             'role_id'   => 'required|integer|in:0,1,2',
-            'logo'      => 'nullable|image|max:2048',
+            'profile_photo' => 'nullable|image|max:2048',
             'verified'  => 'nullable|boolean',
         ]);
 
-        // Handle logo upload
-        if ($request->hasFile('logo')) {
-            $validated['logo'] = $request->file('logo')->store('logos', 'public');
+        if ($request->hasFile('profile_photo')) {
+            $validated['profile_photo'] = $request->file('profile_photo')->store('profile_photos', 'public');
         }
 
         // Encrypt password
@@ -76,9 +75,8 @@ class UserRegisterController extends Controller
     {
         $user = User::findOrFail($id);
 
-        // Delete logo if exists
-        if ($user->logo && Storage::disk('public')->exists($user->logo)) {
-            Storage::disk('public')->delete($user->logo);
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+            Storage::disk('public')->delete($user->profile_photo);
         }
 
         $user->delete();

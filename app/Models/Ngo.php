@@ -44,7 +44,7 @@ class Ngo extends Model
 
     public function followers()
     {
-        return $this->belongsToMany(User::class, 'follows', 'ngo_id', 'user_id')
+        return $this->belongsToMany(User::class, 'follows', 'ngo_id', 'user_id', 'user_id', 'id')
             ->withTimestamps();
     }
 
@@ -55,6 +55,6 @@ class Ngo extends Model
 
     public function donations()
     {
-        return $this->hasMany(Donation::class);
+        return $this->hasMany(Donation::class, 'ngo_id', 'user_id');
     }
 }

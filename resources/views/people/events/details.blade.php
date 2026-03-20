@@ -147,6 +147,14 @@
                                     @endphp
                                     <p class="text-emerald-600 text-xs font-bold uppercase tracking-widest mt-1">Status: {{ $displayStatus }}</p>
                                 </div>
+                            @elseif(!$event->is_volunteers_required)
+                                <div class="p-6 bg-indigo-50 rounded-3xl border border-indigo-100 text-center">
+                                    <div class="w-12 h-12 bg-indigo-500 rounded-full flex items-center justify-center text-white mx-auto mb-4 shadow-sm">
+                                        <i class="fas fa-info-circle text-lg"></i>
+                                    </div>
+                                    <h4 class="text-indigo-900 font-black tracking-tight">Open Attendance</h4>
+                                    <p class="text-indigo-600 text-xs font-bold uppercase tracking-widest mt-1">No registration needed</p>
+                                </div>
                             @elseif($event->volunteers()->where('status', 'accepted')->count() >= $event->capacity)
                                 <div class="p-6 bg-red-50 rounded-3xl border border-red-100 text-center">
                                     <h4 class="text-red-900 font-black tracking-tight">Full Capacity</h4>

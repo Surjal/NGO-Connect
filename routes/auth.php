@@ -5,7 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
 
 // Registration
-Route::get('/ngo/register', [Auth\RegisterNgoController::class, 'showRegistrationForm'])->name('register.ngo');
+Route::get('/ngo/register', [Auth\RegisterNgoController::class, 'showRegistrationForm'])->name('register.ngo.form');
 Route::post('/ngo/register', [Auth\RegisterNgoController::class, 'register'])->name('register.ngo');
 
 Route::get('/people/register', [Auth\RegisterPeopleController::class, 'showRegistrationForm'])->name('register.people');

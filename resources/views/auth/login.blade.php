@@ -7,7 +7,8 @@
             <!-- Logo -->
             <div class="text-center mb-10">
                 <a href="{{ url('/') }}" class="inline-block group">
-                    <img src="{{ url('logo-nobg.png') }}" alt="Logo" class="h-12 mx-auto group-hover:scale-105 transition-all duration-300 drop-shadow-md">
+                    <img src="{{ url('logo-nobg.png') }}" alt="Logo"
+                        class="h-12 mx-auto group-hover:scale-105 transition-all duration-300 drop-shadow-md">
                 </a>
             </div>
 
@@ -36,17 +37,13 @@
                         <div class="space-y-2">
                             <label for="email" class="block text-sm font-bold text-slate-700">Email Address</label>
                             <input type="email" name="email" id="email" value="{{ old('email') }}"
-                                class="input-premium"
-                                placeholder="Enter your email address"
-                                required>
+                                class="input-premium" placeholder="Enter your email address" required>
                         </div>
 
                         <div class="space-y-2">
                             <label for="password" class="block text-sm font-bold text-slate-700">Password</label>
-                            <input type="password" name="password" id="password"
-                                class="input-premium"
-                                placeholder="Enter your password"
-                                required>
+                            <input type="password" name="password" id="password" class="input-premium"
+                                placeholder="Enter your password" required>
                         </div>
 
                         <button type="submit" class="btn-primary w-full py-3 text-base">
@@ -60,11 +57,13 @@
                             Don't have an account?
                         </p>
                         <div class="flex items-center justify-center gap-4 mt-3">
-                            <a href="{{ route('register.people') }}" class="text-primary hover:text-primary-hover font-bold text-sm transition-colors">
+                            <a href="{{ route('register.people') }}"
+                                class="text-primary hover:text-primary-hover font-bold text-sm transition-colors">
                                 <i class="fas fa-user mr-1"></i> People
                             </a>
                             <span class="text-slate-300">|</span>
-                            <a href="{{ route('register.ngo') }}" class="text-primary hover:text-primary-hover font-bold text-sm transition-colors">
+                            <a href="{{ route('register.ngo.form') }}"
+                                class="text-primary hover:text-primary-hover font-bold text-sm transition-colors">
                                 <i class="fas fa-building mr-1"></i> NGO
                             </a>
                         </div>

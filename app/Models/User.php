@@ -14,7 +14,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'logo',
         'role_id',
         'phone',
         'owner_id',
@@ -45,7 +44,14 @@ class User extends Authenticatable
     }
 
     public function followedNgos(){
-        return $this->belongsToMany(Ngo::class, 'follows', 'user_id', 'ngo_id')->withTimestamps();
+        return $this->belongsToMany(
+            Ngo::class,
+            'follows',
+            'user_id',
+            'ngo_id',
+            'id',
+            'user_id'
+        )->withTimestamps();
     }
 
     public function role()
@@ -69,7 +75,7 @@ class User extends Authenticatable
     }
 
     public function likedPosts(){
-        return $this->belongsToMany(Post::class,'likes'); //likes is the pivot table
+        return $this->belongsToMany(Post::class, 'post_has_likes', 'user_id', 'post_id');
     }
 
     public function isAdmin()

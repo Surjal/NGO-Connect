@@ -23,9 +23,6 @@ class GuestFeedController extends Controller
             ->get();
 
         $sortedPosts = $this->feedController->sortPostsForFeed($posts, null, 3);
-        
-        // Uncomment to debug
-        // die("DEBUG: Posts fetched: " . $posts->count() . " | Sorted: " . $sortedPosts->count());
 
         return view('guest-feed', ['posts' => $sortedPosts]);
     }

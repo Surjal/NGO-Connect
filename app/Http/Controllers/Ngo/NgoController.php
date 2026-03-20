@@ -65,8 +65,7 @@ class NgoController extends Controller
 
         // map to users
         $followers = $follows->map->user->filter();
-        // dd($followers);
-        return view('ngo.followers',compact('followers'));
+        return view('ngo.followers', compact('followers'));
 
     }
 

@@ -23,8 +23,8 @@ class LoginController extends Controller
         if (Auth::attempt($credentials)) {
             $user = Auth::user();
 
-            // Check if user is verified
-            if (!$user->verified) {
+            // People accounts do not require manual verification.
+            if (!$user->verified && !$user->isPeople()) {
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();

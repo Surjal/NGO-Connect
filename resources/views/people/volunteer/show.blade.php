@@ -89,7 +89,7 @@
                     <div class="relative h-56 overflow-hidden">
                         @if($event->cover_image_path_name)
                             <img class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                                src="{{ asset($event->cover_image_path_name) }}" alt="{{ $event->title }}">
+                                src="{{ asset('storage/' . $event->cover_image_path_name) }}" alt="{{ $event->title }}">
                         @else
                             <div class="w-full h-full bg-gradient-to-br from-red-100 to-red-100 flex items-center justify-center text-red-300">
                                 <span class="iconify text-7xl" data-icon="fluent:calendar-sparkle-24-regular"></span>

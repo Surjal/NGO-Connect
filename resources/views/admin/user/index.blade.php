@@ -43,8 +43,8 @@
             </div>
 
             <div>
-                <label class="block text-sm font-medium text-gray-700 mb-1">Logo (optional)</label>
-                <input type="file" name="logo" accept="image/*"
+                <label class="block text-sm font-medium text-gray-700 mb-1">Profile Photo (optional)</label>
+                <input type="file" name="profile_photo" accept="image/*"
                     class="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring focus:ring-red-200">
             </div>
 

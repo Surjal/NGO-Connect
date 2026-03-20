@@ -10,7 +10,8 @@
                     <p class="text-sm text-gray-500 mt-1">View and manage registered organizations</p>
                 </div>
                 <div>
-                    <a href="{{ route('register.ngo') }}" class="btn-primary py-2.5 px-5 text-sm flex items-center gap-2">
+                    <a href="{{ route('register.ngo.form') }}"
+                        class="btn-primary py-2.5 px-5 text-sm flex items-center gap-2">
                         <i class="fas fa-plus"></i> Add NGO
                     </a>
                 </div>
@@ -26,7 +27,7 @@
                     </div>
                     <div class="relative">
                         <i class="fas fa-tag absolute left-4 top-3.5 text-gray-400"></i>
-                         <input type="text" id="search-category" placeholder="Category..."
+                        <input type="text" id="search-category" placeholder="Category..."
                             class="input-premium pl-10 w-full">
                     </div>
                     <div class="relative">
@@ -47,11 +48,16 @@
                 <table class="w-full">
                     <thead class="bg-gray-50/50 border-b border-white/20">
                         <tr>
-                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">NGO Name</th>
-                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Category</th>
-                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Address</th>
-                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Reg. No</th>
-                             <th class="px-8 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">NGO
+                                Name</th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                Category</th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Address
+                            </th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Reg. No
+                            </th>
+                            <th class="px-8 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                Actions</th>
                         </tr>
                     </thead>
                     <tbody id="ngo-table-body" class="divide-y divide-gray-100">
@@ -126,11 +132,12 @@
                     const sn = (page - 1) * 10 + i + 1;
                     var routengodetail = "{{ route('admin.ngos.show', ':id') }}";
                     routengodetail = routengodetail.replace(':id', ngo.id);
-                    
+
                     // Safe access to nested properties
                     const category = ngo.ngo && ngo.ngo.category ? ngo.ngo.category : 'N/A';
                     const address = ngo.ngo && ngo.ngo.address ? ngo.ngo.address : 'N/A';
-                    const regNo = ngo.ngo && ngo.ngo.registration_number ? ngo.ngo.registration_number : 'N/A';
+                    const regNo = ngo.ngo && ngo.ngo.registration_number ? ngo.ngo.registration_number :
+                        'N/A';
 
                     const row = `
                 <tr class="hover:bg-red-50/30 transition-colors group">
@@ -170,18 +177,20 @@
             // ----- RENDER PAGINATION -----
             function renderPagination(links, current) {
                 const container = $('#pagination-container').empty();
-                
-                 if (links.length > 3) { // Only show if we have pages
+
+                if (links.length > 3) { // Only show if we have pages
                     let html = '<div class="flex items-center gap-1">';
                     links.forEach(link => {
-                        const active = link.label == current; // Note: loose comparison because link.label might be string
-                        const activeClass = active ? 'bg-red-600 text-white shadow-md shadow-red-200' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200';
+                        const active = link.label ==
+                        current; // Note: loose comparison because link.label might be string
+                        const activeClass = active ? 'bg-red-600 text-white shadow-md shadow-red-200' :
+                            'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200';
                         const disabled = !link.url ? 'opacity-50 cursor-not-allowed' : '';
-                        
+
                         // Clean label (remove &laquo; etc)
                         let label = link.label;
-                        if(label.includes('Previous')) label = '<i class="fas fa-chevron-left"></i>';
-                        if(label.includes('Next')) label = '<i class="fas fa-chevron-right"></i>';
+                        if (label.includes('Previous')) label = '<i class="fas fa-chevron-left"></i>';
+                        if (label.includes('Next')) label = '<i class="fas fa-chevron-right"></i>';
 
                         html += link.url ?
                             `<a href="${link.url}" class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${activeClass} ${disabled}">${label}</a>` :
@@ -189,7 +198,7 @@
                     });
                     html += '</div>';
                     container.append(html);
-                 }
+                }
             }
 
 

@@ -10,7 +10,8 @@
                     <p class="text-sm text-gray-500 mt-1">View and manage registered users</p>
                 </div>
                 <div>
-                     <a href="{{ route('admin.user.register') }}" class="btn-primary py-2.5 px-5 text-sm flex items-center gap-2">
+                    <a href="{{ route('admin.user.register') }}"
+                        class="btn-primary py-2.5 px-5 text-sm flex items-center gap-2">
                         <i class="fas fa-user-plus"></i> Add User
                     </a>
                 </div>
@@ -19,7 +20,7 @@
             <!-- Search -->
             <div class="px-8 py-6 bg-white/30 backdrop-blur-sm border-b border-white/20">
                 <div class="relative max-w-md">
-                     <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
+                    <i class="fas fa-search absolute left-4 top-3.5 text-gray-400"></i>
                     <input type="text" id="search-user-name" placeholder="Search By User Name..."
                         class="input-premium pl-10 w-full">
                 </div>
@@ -30,11 +31,16 @@
                 <table class="w-full">
                     <thead class="bg-gray-50/50 border-b border-white/20">
                         <tr>
-                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">User</th>
-                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email</th>
-                             <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status</th>
-                             <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Joined</th>
-                            <th class="px-8 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">Actions</th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">User
+                            </th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Email
+                            </th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Status
+                            </th>
+                            <th class="px-8 py-4 text-left text-xs font-bold text-gray-500 uppercase tracking-wider">Joined
+                            </th>
+                            <th class="px-8 py-4 text-right text-xs font-bold text-gray-500 uppercase tracking-wider">
+                                Actions</th>
                         </tr>
                     </thead>
                     <tbody id="user-table-body" class="divide-y divide-gray-100">
@@ -44,7 +50,7 @@
             </div>
 
             <!-- Pagination -->
-             <div class="px-8 py-6 border-t border-white/20 bg-gray-50/30 flex items-center justify-between"
+            <div class="px-8 py-6 border-t border-white/20 bg-gray-50/30 flex items-center justify-between"
                 id="pagination-container">
                 <!-- Filled by JS -->
             </div>
@@ -105,22 +111,26 @@
                     const sn = (page - 1) * 10 + i + 1;
                     var routeUserDetail = "{{ route('admin.user.show', ':id') }}";
                     routeUserDetail = routeUserDetail.replace(':id', user.id);
-                    
-                    const statusBadge = user.suspended 
-                        ? `<span class="px-2 py-1 rounded-md bg-red-50 text-red-600 text-xs font-bold border border-red-100">Suspended</span>`
-                        : `<span class="px-2 py-1 rounded-md bg-green-50 text-green-600 text-xs font-bold border border-green-100">Active</span>`;
-                    
-                     // Format date logic for JS (basic)
+
+                    const statusBadge = user.suspended ?
+                        `<span class="px-2 py-1 rounded-md bg-red-50 text-red-600 text-xs font-bold border border-red-100">Suspended</span>` :
+                        `<span class="px-2 py-1 rounded-md bg-green-50 text-green-600 text-xs font-bold border border-green-100">Active</span>`;
+
+                    // Format date logic for JS (basic)
                     const date = new Date(user.created_at);
-                    const dateStr = date.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' });
+                    const dateStr = date.toLocaleDateString('en-US', {
+                        day: 'numeric',
+                        month: 'short',
+                        year: 'numeric'
+                    });
 
                     const row = `
                         <tr class="hover:bg-red-50/30 transition-colors group">
                             <td class="px-8 py-5 whitespace-nowrap">
                                 <div class="flex items-center">
                                     <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center text-red-600 font-bold text-sm mr-4 overflow-hidden">
-                                        ${user.profile_photo_path 
-                                            ? `<img src="/storage/${user.profile_photo_path}" class="w-full h-full object-cover">` 
+                                        ${user.profile_photo 
+                                            ? `<img src="/storage/${user.profile_photo}" class="w-full h-full object-cover">` 
                                             : user.name.charAt(0).toUpperCase()}
                                     </div>
                                     <div class="text-sm font-bold text-gray-900">${escapeHtml(user.name)}</div>
@@ -147,17 +157,18 @@
             // ----- RENDER PAGINATION -----
             function renderPagination(links, current) {
                 const container = $('#pagination-container').empty();
-                
-                 if (links.length > 3) {
+
+                if (links.length > 3) {
                     let html = '<div class="flex items-center gap-1">';
                     links.forEach(link => {
                         const active = link.label == current;
-                        const activeClass = active ? 'bg-red-600 text-white shadow-md shadow-red-200' : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200';
+                        const activeClass = active ? 'bg-red-600 text-white shadow-md shadow-red-200' :
+                            'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200';
                         const disabled = !link.url ? 'opacity-50 cursor-not-allowed' : '';
-                        
+
                         let label = link.label;
-                        if(label.includes('Previous')) label = '<i class="fas fa-chevron-left"></i>';
-                        if(label.includes('Next')) label = '<i class="fas fa-chevron-right"></i>';
+                        if (label.includes('Previous')) label = '<i class="fas fa-chevron-left"></i>';
+                        if (label.includes('Next')) label = '<i class="fas fa-chevron-right"></i>';
 
                         html += link.url ?
                             `<a href="${link.url}" class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold transition-all ${activeClass} ${disabled}">${label}</a>` :
@@ -165,7 +176,7 @@
                     });
                     html += '</div>';
                     container.append(html);
-                 }
+                }
             }
 
             // ----- HELPERS -----

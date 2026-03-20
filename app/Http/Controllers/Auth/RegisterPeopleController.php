@@ -32,7 +32,7 @@ class RegisterPeopleController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role_id' => 2, // Default to people
-            'verified' => false,
+            'verified' => true,
         ]);
 
         auth()->login($user);

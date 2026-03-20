@@ -146,6 +146,9 @@ Route::middleware(['auth', 'check.verified'])->group(function () {
         Route::get('/notifications', [People\NotificationController::class, 'index'])->name('people.notifications');
         Route::post('/notifications/{id}/read', [People\NotificationController::class, 'markAsRead'])->name('people.notifications.read');
 
+        // Recommendations Route (AI feature)
+        Route::get('/recommendations', [People\RecommendationController::class, 'index'])->name('people.recommendations');
+
         Route::get('/ngo/register', [People\NgoRegisterController::class, 'showRegistrationForm'])->name('people.ngo.register.form');
         Route::post('/ngo/register', [People\NgoRegisterController::class, 'register'])->name('people.ngo.register');
 
@@ -192,23 +195,4 @@ Route::middleware(['auth', 'check.verified'])->group(function () {
 // Route::get('/privacy', [Website\StaticPageController::class, 'privacy'])->name('privacy');
 // Route::get('/terms', [Website\StaticPageController::class, 'terms'])->name('terms');
 // Route::get('/advertising', [Website\StaticPageController::class, 'advertising'])->name('advertising');
-// Route::get('/cookies', [Website\StaticPageController::class, 'cookies'])->name('cookies');
 // Route::get('/more', [Website\StaticPageController::class, 'more'])->name('more');
-
-Route::get('/debug-volunteers', function () {
-    $event = \App\Models\Event::where('title', 'like', '%Art Competition%')->first();
-    if(!$event) return 'Event not found';
-    
-    $pivotCount = \Illuminate\Support\Facades\DB::table('event_has_volunteers')->where('event_id', $event->id)->count();
-    $relationCount = $event->volunteers()->count();
-    
-    $pivotRows = \Illuminate\Support\Facades\DB::table('event_has_volunteers')->where('event_id', $event->id)->get();
-    
-    $output = "Event: {$event->title} (ID: {$event->id})\nPivot Count: $pivotCount\nRelation Count: $relationCount\n";
-    
-    foreach($pivotRows as $row) {
-        $user = \App\Models\User::find($row->user_id);
-        $output .= "Pivot User ID {$row->user_id} | Status: {$row->status} | User Found: " . ($user ? "YES ({$user->name}, verified: {$user->verified})" : "NO") . "\n";
-    }
-    return response($output, 200)->header('Content-Type', 'text/plain');
-});

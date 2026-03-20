@@ -33,6 +33,16 @@
             </a>
         </li>
         <li>
+            <a href="{{ route('people.recommendations') }}"
+                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-white hover:text-primary hover:shadow-sm transition-all duration-300 group
+                {{ request()->routeIs('people.recommendations') ? 'bg-white shadow-sm text-primary border border-slate-100' : '' }}">
+                <div class="w-9 h-9 bg-purple-50 rounded-xl flex items-center justify-center group-hover:bg-purple-100 group-hover:rotate-6 transition-all">
+                    <i class="fas fa-sparkles text-purple-500 text-sm"></i>
+                </div>
+                <span class="font-bold text-sm bg-clip-text group-hover:text-transparent group-hover:bg-gradient-to-r group-hover:from-purple-600 group-hover:to-pink-500 transition-all">For You (AI)</span>
+            </a>
+        </li>
+        <li>
             <a href="{{ route('people.volunteer.opportunities') }}"
                 class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-white hover:text-primary hover:shadow-sm transition-all duration-300 group
                 {{ request()->routeIs('people.volunteer.opportunities') ? 'bg-white shadow-sm text-primary border border-slate-100' : '' }}">

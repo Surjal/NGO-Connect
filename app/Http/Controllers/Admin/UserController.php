@@ -30,11 +30,11 @@ class UserController extends Controller
         // ---------- JSON RESPONSE FOR AJAX ----------
         if ($request->has('user')) {
             return response()->json([
-                'users'        => $users->items(),
+                'users' => $users->items(),
                 'current_page' => $users->currentPage(),
-                'last_page'    => $users->lastPage(),
-                'links'        => $users->linkCollection()->toArray(),
-                'total'        => $users->total(),
+                'last_page' => $users->lastPage(),
+                'links' => $users->linkCollection()->toArray(),
+                'total' => $users->total(),
             ]);
         }
 
@@ -55,9 +55,9 @@ class UserController extends Controller
      */
     public function verify(Request $request, $id)
     {
-        $user = User::where('role_id', 2)->findOrFail($id);
+        $user = User::where('role_id', 2)->with('ngo')->findOrFail($id);
         $user->update(['verified' => true]);
-        $owner = User::find($user->ngo->owner_id ?? null);
+        $owner = User::find($user->ngo?->owner_id);
         $owner?->update(['verified' => true]);
 
         $user->notify(new NgoRegistrationApproved($user->name, true));

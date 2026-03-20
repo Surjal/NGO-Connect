@@ -13,6 +13,7 @@ class Event extends Model
         'requirements',
         'location',
         'type',
+        'category',
         'start_date',
         'end_date',
         'cover_image_path_name',
@@ -21,6 +22,22 @@ class Event extends Model
         'user_id',
         'check_in_token',
     ];
+
+    /**
+     * Get the NGO profile associated with the event creator.
+     * Events are created by NGO users, so we go User -> Ngo.
+     */
+    public function ngo()
+    {
+        return $this->hasOneThrough(
+            \App\Models\Ngo::class,
+            \App\Models\User::class,
+            'id',        // users.id
+            'user_id',   // ngos.user_id
+            'user_id',   // events.user_id
+            'id'         // users.id
+        );
+    }
 
     /**
      * The "booted" method of the model.
