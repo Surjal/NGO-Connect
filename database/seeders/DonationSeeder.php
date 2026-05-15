@@ -3,7 +3,6 @@
 namespace Database\Seeders;
 
 use App\Models\Donation;
-use App\Models\DonationHasPayment;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
@@ -28,27 +27,12 @@ class DonationSeeder extends Seeder
             for ($i = 0; $i < $donationCount; $i++) {
                 $ngo = $ngos->random();
                 $amount = rand(50, 5000);
-                $status = collect(['completed', 'completed', 'pending', 'failed'])->random();
 
-                $donation = Donation::create([
+                Donation::create([
                     'user_id' => $person->id,
                     'ngo_id' => $ngo->id,
                     'donation_amount' => $amount,
-                    'status' => $status,
                 ]);
-
-                if ($status === 'completed') {
-                    DonationHasPayment::create([
-                        'donation_id' => $donation->id,
-                        'payment_method' => 'esewa',
-                        'payment_response' => [
-                            'transaction_id' => 'TEST_' . uniqid(),
-                            'amount' => $amount,
-                            'status' => 'success',
-                        ],
-                        'status' => 'success',
-                    ]);
-                }
             }
         }
     }

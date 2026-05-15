@@ -3,17 +3,17 @@
 namespace App\Http\Controllers\Ngo;
 
 use App\Http\Controllers\Controller;
+use App\Models\Donation;
 use App\Models\Event;
 use App\Models\Follows;
-use App\Models\Donation;
 use App\Models\Post;
-use Illuminate\Http\Request;
+use App\Services\ChurnPredictionService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(ChurnPredictionService $churnPredictionService)
     {
         $ngoUserId = Auth::id();
 
@@ -21,7 +21,6 @@ class DashboardController extends Controller
         $totalEvents = Event::where('user_id', $ngoUserId)->count();
         $totalFollowers = Follows::where('ngo_id', $ngoUserId)->count();
         $totalDonations = Donation::where('ngo_id', $ngoUserId)
-            ->where('status', 'completed')
             ->sum('donation_amount');
             
         $totalVolunteers = DB::table('event_has_volunteers')
@@ -38,7 +37,6 @@ class DashboardController extends Controller
 
         $recentDonations = Donation::with('user')
             ->where('ngo_id', $ngoUserId)
-            ->where('status', 'completed')
             ->orderBy('created_at', 'desc')
             ->take(5)
             ->get();
@@ -53,6 +51,8 @@ class DashboardController extends Controller
             $q->where('user_id', $ngoUserId);
         })->where('status', '!=', 'completed')->get();
 
+        $churnData = $churnPredictionService->ensureDashboardPredictionsForNgo($ngoUserId);
+
         return view('ngo.dashboard', compact(
             'totalEvents', 
             'totalFollowers', 
@@ -61,7 +61,8 @@ class DashboardController extends Controller
             'upcomingEvents',
             'recentDonations',
             'recentPosts',
-            'milestones'
+            'milestones',
+            'churnData'
         ));
     }
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Common;
 
+use App\Jobs\ComputeUserRecommendations;
 use App\Models\Post;
 use App\Models\Media;
 use App\Models\Follows;
@@ -287,6 +288,7 @@ class FeedController extends Controller
         if ($alreadyLiked->exists()) {
             $alreadyLiked = $alreadyLiked->first();
             $alreadyLiked->delete();
+            ComputeUserRecommendations::dispatch($user->id)->afterCommit();
             // $isLiked = false;
 
             return response()->json([
@@ -300,6 +302,7 @@ class FeedController extends Controller
             'post_id' => $request->post_id,
             'user_id' => $user->id,
         ]);
+        ComputeUserRecommendations::dispatch($user->id)->afterCommit();
 
         return response()->json([
             'message' => 'Liked the post successfully',
@@ -324,6 +327,7 @@ class FeedController extends Controller
             'user_id' => $user->id,
             'parent_id' => $request->parent_id,
         ]);
+        ComputeUserRecommendations::dispatch($user->id)->afterCommit();
 
         $comments = PostHasComments::with(['user', 'replies.user'])->where('post_id', $request->post_id)->whereNull('parent_id')->get();
         return response()->json([
@@ -430,6 +434,7 @@ class FeedController extends Controller
             ]);
             $following = true;
         }
+        ComputeUserRecommendations::dispatch($userId)->afterCommit();
 
         return response()->json(['following' => $following]);
     }

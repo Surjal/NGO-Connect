@@ -35,7 +35,7 @@
                 </div>
             </div>
 
-            <!-- Donations -->
+            {{-- <!-- Donations -->
             <div
                 class="glass-panel p-6 flex items-center justify-between group hover:shadow-lg transition-all duration-300">
                 <div>
@@ -46,7 +46,7 @@
                     class="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
                     <i class="fas fa-hand-holding-heart"></i>
                 </div>
-            </div>
+            </div> --}}
 
             <!-- Pending Approvals -->
             <div
@@ -96,7 +96,7 @@
                                     community. Please review them to maintain community standards.</p>
                             </div>
                         </div>
-                        <a href="#"
+                        <a href="{{ route('admin.log') }}"
                             class="inline-flex items-center justify-center w-full px-4 py-3 bg-red-500 text-white font-bold rounded-xl hover:bg-red-600 transition-colors shadow-lg shadow-red-200">
                             Review Reported Content <i class="fas fa-arrow-right ml-2"></i>
                         </a>
@@ -115,7 +115,9 @@
                 <div class="glass-panel p-6">
                     <div class="flex items-center justify-between mb-6">
                         <h3 class="text-lg font-bold text-gray-900">Recent System Activity</h3>
-                        <button class="text-sm font-bold text-gray-400 hover:text-gray-600">View Log</button>
+                        <a href="{{ route('admin.log') }}" class="text-sm font-bold text-gray-400 hover:text-gray-600 transition-colors">
+                            View Log
+                        </a>
                     </div>
                     <div class="space-y-4">
                         <!-- Placeholder items -->

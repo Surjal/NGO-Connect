@@ -19,6 +19,11 @@
                 <p class="text-lg md:text-xl font-medium text-white/90">
                     Based on your activity, we've found NGOs and volunteer opportunities that align perfectly with your interests.
                 </p>
+                @if($stored && $stored->computed_at)
+                    <p class="mt-4 text-xs font-bold uppercase tracking-widest text-white/70">
+                        Last updated: {{ $stored->computed_at->diffForHumans() }}
+                    </p>
+                @endif
                 
                 @if($topCategory)
                     <div class="mt-8 flex flex-col items-center">

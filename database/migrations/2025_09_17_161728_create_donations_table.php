@@ -16,7 +16,6 @@ return new class extends Migration
             $table->unsignedBigInteger('user_id');
             $table->unsignedBigInteger('ngo_id');
             $table->decimal('donation_amount', 10, 2);
-            $table->enum('status', ['pending', 'completed', 'failed'])->default('pending');
             $table->timestamps();
             $table->foreign('ngo_id')->references('id')->on('users')->onDelete('cascade');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

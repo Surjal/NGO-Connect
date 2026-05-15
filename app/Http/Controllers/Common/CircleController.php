@@ -14,7 +14,7 @@ class CircleController extends Controller
     public function index($ngoId)
     {
         $ngo = User::where('role_id', 1)->findOrFail($ngoId);
-        $threads = $ngo->threadsAsNgo()->with(['user', 'replies'])->latest()->get();
+        $threads = $ngo->threadsAsNgo()->with(['user', 'replies.user'])->latest()->get();
 
         return view('common.circles.index', compact('ngo', 'threads'));
     }

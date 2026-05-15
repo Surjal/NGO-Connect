@@ -23,10 +23,6 @@ use Illuminate\Support\Facades\Route;
 // For authentication routes
 require __DIR__ . '/auth.php';
 
-// Mock eSewa Routes (for local testing)
-Route::match(['get', 'post'], '/mock/esewa', [Common\MockEsewaController::class, 'index'])->name('mock.esewa');
-Route::post('/mock/esewa/pay', [Common\MockEsewaController::class, 'pay'])->name('mock.esewa.pay');
-
 Route::get('/', function () {
     if (!auth()->check()) {
         return app(App\Http\Controllers\GuestFeedController::class)->index();
@@ -111,7 +107,6 @@ Route::middleware(['auth', 'check.verified'])->group(function () {
         Route::delete('/milestones/{milestoneId}', [Ngo\MilestoneController::class, 'destroy'])->name('ngo.milestones.delete');
 
         Route::get('/donations', [Ngo\DonationController::class, 'donations'])->name('ngo.donations');
-        Route::post('/donations/{donationId}/verify', [Ngo\DonationController::class, 'verifyDonation'])->name('ngo.donations.verify');
 
         Route::get('/notifications', [Ngo\NotificationController::class, 'notifications'])->name('ngo.notifications');
         Route::post('/notifications/{id}/read', [Ngo\NotificationController::class, 'markAsRead'])->name('ngo.notifications.read');
@@ -133,14 +128,6 @@ Route::middleware(['auth', 'check.verified'])->group(function () {
         Route::get('/volunteer/opportunities', [People\VolunteerController::class, 'index'])->name('people.volunteer.opportunities');
         Route::post('/volunteer/apply', [People\VolunteerController::class, 'apply'])->name('people.volunteer.apply');
         Route::get('/volunteer/{id}/details', [People\VolunteerController::class, 'showEventDetails'])->name('people.volunteer.details');
-
-        // Donations Routes
-        Route::get('/donations', [People\DonationController::class, 'index'])->name('people.donations');
-        Route::post('/donate/payment', [People\DonationController::class, 'showPaymentForm'])->name('donations.payment.request');
-        Route::get('/donation/payment/success', [People\DonationController::class, 'paymentSuccess'])->name('payment.success');
-        Route::get('/donation/payment/fail', [People\DonationController::class, 'paymentFail'])->name('payment.fail');
-
-        // Route::get('/donations', [People\DonationController::class, 'index'])->name('people.donations');
 
         // Notifications Routes
         Route::get('/notifications', [People\NotificationController::class, 'index'])->name('people.notifications');
@@ -165,6 +152,7 @@ Route::middleware(['auth', 'check.verified'])->group(function () {
         Route::get('/feed', [Common\FeedController::class, 'index'])->name('common.feed');
         Route::post('/feed', [Common\FeedController::class, 'create'])->name('common.post.create');
         Route::get('/ngo/profile/{id}', [Common\NgoProfileController::class, 'index'])->name('common.ngo.profile');
+        Route::get('/ngo/profile/{id}/feed', [Common\NgoProfileController::class, 'feed'])->name('common.ngo.profile.feed');
         Route::post('/post/like', [Common\FeedController::class, 'like'])->name('common.post.like');
         Route::post('/post/comment', [Common\FeedController::class, 'comment'])->name('common.post.comment');
         Route::post('/post/report', [Common\FeedController::class, 'report'])->name('common.post.report');

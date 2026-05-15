@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class PostHasReports extends Model
 {
     use HasFactory;
+
     protected $fillable = [
         'user_id',
         'post_id',
@@ -15,4 +16,13 @@ class PostHasReports extends Model
         'report_description'
     ];
 
+    public function post()
+    {
+        return $this->belongsTo(Post::class, 'post_id');
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }

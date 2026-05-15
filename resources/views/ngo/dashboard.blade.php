@@ -72,6 +72,8 @@
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         <!-- Left Column: Upcoming Events & Quick Actions -->
         <div class="lg:col-span-3 space-y-6">
+            @include('ngo.partials.churn_widget')
+
             <!-- Upcoming Events Card -->
             <div class="glass-panel overflow-hidden">
                 <div class="p-6 border-b border-slate-100 flex items-center justify-between">

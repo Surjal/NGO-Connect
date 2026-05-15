@@ -1,76 +1,97 @@
 @extends('layouts.app')
 
 @section('content')
-    <!-- Header with Background -->
-    <div class="relative bg-white border-b border-gray-200">
-        <!-- Banner/Cover -->
-        <div class="h-48 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 w-full absolute top-0 left-0 z-0">
-            <div class="absolute inset-0 bg-black/20 pattern-dots"></div>
+    <div class="relative overflow-hidden bg-white border-b border-red-100/80">
+        <div class="absolute left-0 top-0 z-0 h-44 w-full overflow-hidden rounded-b-2xl bg-red-700 pointer-events-none">
+            <div class="absolute inset-0 opacity-100 pointer-events-none"
+                style="background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 20px 20px;">
+            </div>
         </div>
 
-        <div class="max-w-7xl mx-auto px-4 pt-24 pb-8 relative z-10">
-            <div class="flex items-end gap-6">
-                <!-- Profile Image -->
-                <div class="flex-shrink-0">
+        <div class="relative z-10 mx-auto max-w-7xl px-4 pb-10 pt-20">
+            <div class="flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                <div class="shrink-0">
                     <div
-                        class="w-32 h-32 rounded-full ring-4 ring-white shadow-lg bg-white overflow-hidden flex items-center justify-center">
+                        class="relative z-20 flex h-36 w-36 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-white ring-4 ring-white shadow-lg">
                         @if ($ngo->ngo && $ngo->ngo->logo)
                             <img src="{{ asset('storage/' . $ngo->ngo->logo) }}" alt="{{ $ngo->name }}"
                                 class="w-full h-full object-cover">
                         @else
                             <div
-                                class="w-full h-full bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center">
+                                class="w-full h-full bg-linear-to-br from-red-500 to-red-600 flex items-center justify-center">
                                 <span class="text-4xl font-bold text-white">{{ substr($ngo->name, 0, 1) }}</span>
                             </div>
                         @endif
                     </div>
                 </div>
 
-                <!-- Info Section -->
-                <div class="flex-1 pb-2">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h1 class="text-3xl font-bold text-gray-900 mb-1">{{ $ngo->name }}</h1>
-                            <div class="flex items-center gap-3 text-sm mt-2">
-                                <span
-                                    class="px-3 py-1 rounded-full bg-red-50 text-red-600 font-medium border border-red-100 flex items-center gap-1">
-                                    <i class="fas fa-tag text-xs"></i> {{ $ngo->ngo->category }}
-                                </span>
-                                @if ($ngo->ngo->subcategory)
+                <div class="flex-1 min-w-0 pb-2">
+                    <div class="flex flex-col gap-5 xl:flex-row xl:items-end xl:justify-between">
+                        <div class="min-w-0">
+                            <div class="flex flex-col items-start gap-2">
+                                <h1 title="{{ $ngo->name }}"
+                                    class="max-w-3xl text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl truncate">
+                                    {{ $ngo->name }}
+                                </h1>
+                                @if ($ngo->ngo->verified)
                                     <span
-                                        class="px-3 py-1 rounded-full bg-red-50/60 text-red-500 font-medium border border-red-100">
-                                        {{ $ngo->ngo->subcategory }}
+                                        class="inline-flex items-center gap-1.5 rounded-full border border-green-400/30 bg-green-400 px-3 py-1 text-xs font-semibold text-white backdrop-blur-md shadow-sm">
+                                        <i class="fas fa-badge-check text-green-500"></i>
+                                        Verified
                                     </span>
                                 @endif
-                                <span class="text-gray-500 flex items-center gap-1 ml-1"
-                                    id="profile-followers-count-wrapper">
-                                    <i class="fas fa-users text-gray-400"></i>
-                                    <span id="profile-followers-count"
-                                        class="font-bold text-gray-900">{{ $followersCount }}</span> followers
+                            </div>
+
+                            <div class="mt-6 flex flex-wrap md:flex-nowrap items-center gap-3 text-sm text-gray-100">
+                                <span
+                                    class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/20 px-4 py-2 text-sm font-medium text-red-500 backdrop-blur-md shadow-sm transition-colors duration-200 hover:bg-white/25">
+                                    <i class="fas fa-layer-group text-red-500"></i>
+                                    {{ $ngo->ngo->category }}
                                 </span>
+                                {{-- @if ($ngo->ngo->subcategory)
+                                    <span
+                                        class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/20 px-4 py-2 text-sm font-medium text-red-500 backdrop-blur-md shadow-sm transition-colors duration-200 hover:bg-white/25">
+                                        <i class="fas fa-sparkles text-red-500"></i>
+                                        {{ $ngo->ngo->subcategory }}
+                                    </span>
+                                @endif --}}
+                                <div id="profile-followers-count-wrapper"
+                                    class="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/95 px-4 py-2 shadow-sm flex-shrink-0 min-w-[10rem]">
+                                    <span
+                                        class="flex h-9 w-9 items-center justify-center rounded-full bg-white/12 text-red-500">
+                                        <i class="fas fa-users"></i>
+                                    </span>
+                                    <div class="leading-tight text-white text-sm">
+                                        <div class="flex items-baseline gap-1">
+                                            <span id="profile-followers-count"
+                                                class="text-xl font-black text-red-500 inline-block text-right font-mono min-w-[2ch]">{{ $followersCount ?? 0 }}</span>
+                                            <span class="text-sm font-semibold text-slate-700">followers</span>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
-                        {{-- Interaction Buttons --}}
                         @if (auth()->check() && auth()->id() != $ngo->id)
-                            <div class="flex items-center gap-3">
+                            <div
+                                class="relative z-20 flex-shrink-0 flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center xl:w-auto xl:justify-end">
                                 <a href="{{ route('common.circles.index', $ngo->id) }}"
-                                    class="px-5 py-2.5 bg-gray-50 text-gray-600 rounded-full font-semibold text-sm hover:bg-red-50 hover:text-red-500 border border-transparent hover:border-red-100 transition-all shadow-sm flex items-center gap-2">
+                                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-white/60 bg-white/95 px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-white hover:text-red-600 active:scale-95">
                                     <span class="iconify" data-icon="fluent:people-community-20-filled"></span>
                                     <span>Circle</span>
                                 </a>
 
                                 <a href="{{ route('common.messages.show', $ngo->id) }}"
-                                    class="px-5 py-2.5 bg-white text-gray-600 border border-gray-200 rounded-full font-semibold text-sm hover:bg-gray-50 transition-all shadow-sm flex items-center gap-2">
+                                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-white/60 bg-white/95 px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-white hover:text-red-600 active:scale-95">
                                     <span class="iconify" data-icon="fluent:mail-20-filled"></span>
                                     <span>Message</span>
                                 </a>
 
                                 <button id="profile-follow-btn" data-ngo-id="{{ $ngo->id }}"
-                                    class="px-6 py-2.5 rounded-full font-semibold text-sm transition-all duration-300 transform active:scale-95 shadow-md
+                                    class="inline-flex items-center justify-center whitespace-nowrap rounded-full px-5 py-2.5 text-sm font-semibold transition-all duration-200 active:scale-95 min-w-[6rem]
                                         {{ $isFollowing
-                                            ? 'bg-white text-gray-700 hover:text-red-600 border border-gray-200 hover:border-red-200'
-                                            : 'bg-gradient-to-r from-red-500 to-red-600 text-white hover:shadow-red-200 hover:from-red-600 hover:to-red-700' }}">
+                                            ? 'border border-white/60 bg-white/95 text-gray-700 hover:text-red-600'
+                                            : 'bg-red-500 text-white shadow-sm hover:bg-red-600' }}">
                                     <i class="fas {{ $isFollowing ? 'fa-user-check' : 'fa-user-plus' }} mr-2"></i>
                                     <span>{{ $isFollowing ? 'Following' : 'Follow' }}</span>
                                 </button>
@@ -78,9 +99,9 @@
                         @endif
 
                         @if (auth()->check() && auth()->id() == $ngo->id)
-                            <div class="flex items-center gap-3">
+                            <div class="flex w-full flex-col gap-3 sm:flex-row sm:items-center xl:w-auto xl:justify-end">
                                 <a href="{{ route('ngo.profile.edit') }}"
-                                    class="px-5 py-2.5 bg-white text-gray-600 border border-gray-200 rounded-full font-semibold text-sm hover:bg-gray-50 hover:text-red-500 border-transparent hover:border-red-100 transition-all shadow-sm flex items-center gap-2">
+                                    class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-full border border-white/60 bg-white/95 px-5 py-2.5 text-sm font-semibold text-slate-700 shadow-sm transition-all duration-200 hover:bg-white hover:text-red-500 active:scale-95">
                                     <span class="iconify" data-icon="fluent:edit-20-filled"></span>
                                     <span>Edit Info</span>
                                 </a>
@@ -92,63 +113,79 @@
         </div>
     </div>
 
-    <!-- Main Content -->
-    <div class="max-w-7xl mx-auto py-8">
+    <div class="max-w-7xl mx-auto px-4 py-8">
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
-            <!-- Left Sidebar - Organization Details & Charts -->
             <div class="lg:col-span-1">
-                <!-- Basic Details Card -->
-                <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-                    <h2 class="text-lg font-bold text-gray-900 mb-4">Organization Details</h2>
+                <div class="mb-6 rounded-2xl border border-gray-100 bg-white p-5 shadow-sm">
+                    <div class="mb-5 flex items-center justify-between">
+                        <h2 class="text-lg font-bold text-gray-900">Organization Details</h2>
+                        <span
+                            class="rounded-full bg-red-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-red-500">About</span>
+                    </div>
 
                     <div class="space-y-4">
-                        <!-- Description -->
-                        <div>
-                            <p class="text-sm font-semibold text-red-500">Description</p>
-                            <p class="text-sm text-gray-900">
+                        <div class="border-t border-gray-100 pt-4">
+                            <p
+                                class="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-red-500">
+                                <i class="fas fa-align-left"></i>
+                                <span>Description</span>
+                            </p>
+                            <p class="border-l-2 border-red-200 pl-3 text-sm leading-relaxed text-gray-700">
                                 {{ $ngo->ngo->description ?? 'No description provided.' }}
                             </p>
                         </div>
 
-                        <!-- Mission -->
-                        <div class="pt-4 border-t border-gray-200">
-                            <p class="text-sm font-semibold text-red-500">Mission</p>
-                            <p class="text-sm text-gray-900">
+                        <div class="border-t border-gray-100 pt-4">
+                            <p
+                                class="mb-2 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-red-500">
+                                <i class="fas fa-bullseye"></i>
+                                <span>Mission</span>
+                            </p>
+                            <p class="border-l-2 border-red-200 pl-3 text-sm leading-relaxed text-gray-700">
                                 {{ $ngo->ngo->mission ?? 'Mission not provided.' }}
                             </p>
                         </div>
 
-                        <!-- Contact Information -->
-                        <div class="pt-4 border-t border-gray-200">
-                            <p class="text-sm font-semibold text-red-500 mb-3">Contact Information</p>
+                        <div class="border-t border-gray-100 pt-4">
+                            <p
+                                class="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-red-500">
+                                <i class="fas fa-address-card"></i>
+                                <span>Contact Information</span>
+                            </p>
                             <div class="space-y-2 text-sm">
-                                <div class="flex items-start gap-2">
+                                <div class="flex items-start gap-3 border-l-2 border-red-200 pl-3">
+                                    <i class="fas fa-phone mt-0.5 text-red-400"></i>
                                     <span class="text-gray-600 font-medium">Phone:</span>
                                     <span class="text-sm text-gray-900">
                                         {{ $ngo->ngo->phone ?? 'NA.' }}
                                     </span>
                                 </div>
 
-                                <div class="flex items-start gap-2">
+                                <div class="flex items-start gap-3 border-l-2 border-red-200 pl-3">
+                                    <i class="fas fa-location-dot mt-0.5 text-red-400"></i>
                                     <span class="text-gray-600 font-medium">Address:</span>
                                     <span class="text-sm text-gray-900">
                                         {{ $ngo->ngo->address ?? 'NA' }}
                                     </span>
                                 </div>
-
                             </div>
                         </div>
 
-                        <!-- Registration Details -->
-                        <div class="pt-4 border-t border-gray-200">
-                            <p class="text-sm font-semibold text-red-500 mb-3">Registration Details</p>
+                        <div class="border-t border-gray-100 pt-4">
+                            <p
+                                class="mb-3 flex items-center gap-2 text-xs font-semibold uppercase tracking-wide text-red-500">
+                                <i class="fas fa-file-shield"></i>
+                                <span>Registration Details</span>
+                            </p>
                             <div class="space-y-2 text-sm">
-                                <div class="flex items-start gap-2">
+                                <div class="flex items-start gap-3 border-l-2 border-red-200 pl-3">
+                                    <i class="fas fa-id-card mt-0.5 text-red-400"></i>
                                     <span class="text-gray-600 font-medium">Reg. Number:</span>
                                     <span class="text-gray-600">{{ $ngo->ngo->registration_number }} </span>
                                 </div>
-                                <div class="flex items-start gap-2">
+                                <div class="flex items-start gap-3 border-l-2 border-red-200 pl-3">
+                                    <i class="fas fa-map-location-dot mt-0.5 text-red-400"></i>
                                     <span class="text-gray-600 font-medium">District:</span>
                                     <span class="text-gray-600">{{ $ngo->ngo->registration_district }}</span>
                                 </div>
@@ -157,21 +194,21 @@
                     </div>
                 </div>
 
-                <!-- Statistics Cards -->
                 <div class="space-y-4">
-                    <!-- Total Events -->
                     <div
-                        class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 border border-gray-100 group">
+                        class="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm font-medium group-hover:text-red-600 transition-colors">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-gray-400 transition-colors duration-200 group-hover:text-red-500">
                                     Total Events</p>
-                                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-events">{{ $eventsCount }}</p>
+                                <p class="mt-1 text-2xl font-bold text-gray-900" id="total-events">{{ $eventsCount }}
+                                </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center group-hover:bg-red-100 transition-colors">
-                                <svg class="w-6 h-6 text-red-500 group-hover:scale-110 transition-transform" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex h-11 w-11 items-center justify-center rounded-xl bg-red-50 transition-colors duration-200 group-hover:bg-red-100">
+                                <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z">
                                     </path>
@@ -180,20 +217,20 @@
                         </div>
                     </div>
 
-                    <!-- Total Donations -->
                     <div
-                        class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 border border-gray-100 group">
+                        class="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm font-medium group-hover:text-green-600 transition-colors">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-gray-400 transition-colors duration-200 group-hover:text-red-500">
                                     Total Donations</p>
-                                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-donations">
+                                <p class="mt-1 text-2xl font-bold text-gray-900" id="total-donations">
                                     ${{ number_format($stats['total_donations'] ?? 0, 2) }}</p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center group-hover:bg-green-100 transition-colors">
-                                <svg class="w-6 h-6 text-green-500 group-hover:scale-110 transition-transform"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex h-11 w-11 items-center justify-center rounded-xl bg-red-50 transition-colors duration-200 group-hover:bg-red-100">
+                                <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z">
                                     </path>
@@ -202,21 +239,21 @@
                         </div>
                     </div>
 
-                    <!-- Total Followers -->
                     <div
-                        class="bg-white rounded-2xl shadow-sm hover:shadow-md transition-shadow duration-300 p-6 border border-gray-100 group">
+                        class="group rounded-2xl border border-gray-100 bg-white p-5 shadow-sm transition-all duration-200 hover:shadow-md">
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="text-gray-500 text-sm font-medium group-hover:text-red-600 transition-colors">
+                                <p
+                                    class="text-xs font-semibold uppercase tracking-wide text-gray-400 transition-colors duration-200 group-hover:text-red-500">
                                     Total Followers</p>
-                                <p class="text-3xl font-bold text-gray-900 mt-2" id="total-followers">
+                                <p class="mt-1 text-2xl font-bold text-gray-900" id="total-followers">
                                     {{ $followersCount ?? 0 }}
                                 </p>
                             </div>
                             <div
-                                class="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center group-hover:bg-red-100 transition-colors">
-                                <svg class="w-6 h-6 text-red-500 group-hover:scale-110 transition-transform"
-                                    fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                class="flex h-11 w-11 items-center justify-center rounded-xl bg-red-50 transition-colors duration-200 group-hover:bg-red-100">
+                                <svg class="h-5 w-5 text-red-500" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                         d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 10a3 3 0 11-6 0 3 3 0 016 0zM6 20h12a6 6 0 00-6-6 6 6 0 00-6 6z">
                                     </path>
@@ -225,38 +262,37 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- Charts Section -->
-                {{-- <div class="bg-white rounded-lg shadow-md p-6 mt-4">
-                    <h3 class="text-lg font-bold text-gray-900 mb-4">Activity Overview</h3>
-                    <canvas id="activityChart" class="w-full"></canvas>
-                </div> --}}
             </div>
 
-            <!-- Posts Feed -->
             <div class="lg:col-span-2">
-                <div>
-                    <div class="bg-white rounded-lg shadow-md border-b border-gray-200 px-6 py-4 mb-5">
-                        <h2 class="text-xl font-bold text-gray-900">Posts</h2>
+                <div class="rounded-2xl border border-gray-100 bg-white shadow-sm">
+                    <div class="border-b border-gray-100 px-5 py-4">
+                        <div class="flex items-center justify-between gap-4">
+                            <div>
+                                <h2 class="text-lg font-bold text-gray-900">Posts</h2>
+                                <p class="mt-0.5 text-sm text-gray-400">Updates, stories, and community highlights</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="posts-filter"
+                        class="flex gap-2 overflow-x-auto border-b border-gray-100 px-5 py-3 relative z-20 pointer-events-auto">
+                        <button type="button" data-type="all"
+                            class="rounded-full bg-red-500 px-4 py-1.5 text-sm font-semibold text-white transition-all duration-200 hover:bg-red-600 active:scale-95 pointer-events-auto">
+                            All
+                        </button>
+                        <button type="button" data-type="media"
+                            class="rounded-full border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-500 transition-colors duration-200 hover:border-red-200 hover:text-red-500 active:scale-95 pointer-events-auto">
+                            Media
+                        </button>
+                        <button type="button" data-type="events"
+                            class="rounded-full border border-gray-200 px-4 py-1.5 text-sm font-medium text-gray-500 transition-colors duration-200 hover:border-red-200 hover:text-red-500 active:scale-95 pointer-events-auto">
+                            Events
+                        </button>
                     </div>
 
-                    <!-- Posts Container -->
-                    <div id="posts-container" class="space-y-6">
+                    <div id="posts-container" class="space-y-5 p-5">
                         @include('common.feed.partials.post', ['post' => $posts])
                     </div>
-                    {{-- <div id="posts-container" class="divide-y divide-gray-200">
-                        @include('common.feed.partials.post',['post' => $posts])
-                    </div> --}}
-
-                    <!-- Load More Button -->
-                    {{-- <div class="border-t border-gray-200 px-6 py-4 text-center" id="load-more-container"
-                        style="display: none;">
-                        <button id="load-more-btn"
-                            class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-                            Load More Posts
-                        </button>
-                    </div> --}}
-
                 </div>
             </div>
         </div>
@@ -284,7 +320,7 @@
                         if (res.following) {
                             btn.removeClass(
                                     'bg-gray-100 text-gray-700 hover:bg-red-50 hover:text-red-600 border border-gray-200'
-                                    )
+                                )
                                 .addClass('bg-red-500 text-white hover:bg-red-600 shadow-sm');
                             btn.find('i').removeClass('fa-user-plus').addClass('fa-user-check');
                             btn.find('span').text('Following');
@@ -293,7 +329,7 @@
                             btn.removeClass('bg-red-500 text-white hover:bg-red-600 shadow-sm')
                                 .addClass(
                                     'bg-gray-100 text-gray-700 hover:bg-red-50 hover:text-red-600 border border-gray-200'
-                                    );
+                                );
                             btn.find('i').removeClass('fa-user-check').addClass('fa-user-plus');
                             btn.find('span').text('Follow');
                             countEl.text(Math.max(0, currentCount - 1));
@@ -301,6 +337,33 @@
                     },
                     error: function() {
                         alert('Something went wrong. Please try again.');
+                    }
+                });
+            });
+
+            // Posts filter click handler
+            $('#posts-filter').on('click', 'button', function() {
+                var type = $(this).data('type') || 'all';
+                var ngoId = {{ $ngo->id }};
+                var url = '{{ route('common.ngo.profile.feed', ['id' => $ngo->id]) }}';
+
+                // Toggle active styles
+                $('#posts-filter button').removeClass('bg-red-500 text-white font-semibold').addClass(
+                    'border-gray-200 text-gray-500');
+                $(this).removeClass('border-gray-200 text-gray-500').addClass(
+                    'bg-red-500 text-white font-semibold');
+
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    data: {
+                        type: type
+                    },
+                    success: function(html) {
+                        $('#posts-container').html(html);
+                    },
+                    error: function() {
+                        alert('Could not load content. Please try again.');
                     }
                 });
             });

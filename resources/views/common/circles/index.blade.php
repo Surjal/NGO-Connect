@@ -1,135 +1,229 @@
 @extends('layouts.app')
 
 @section('content')
-<div class="min-h-screen bg-gray-50/50 py-12">
-    <div class="max-w-4xl mx-auto px-4">
-        <!-- NGO Header -->
-        <div class="bg-white p-8 rounded-[2.5rem] border border-gray-100 shadow-sm mb-8 flex items-center justify-between overflow-hidden relative">
-            <div class="absolute top-0 right-0 -mt-10 -mr-10 w-40 h-40 bg-red-50 rounded-full blur-3xl"></div>
-            <div class="relative flex items-center gap-6">
-                <div class="w-20 h-20 rounded-3xl bg-gradient-to-br from-red-500 to-red-600 flex items-center justify-center text-white text-3xl font-bold shadow-xl shadow-red-100 ring-8 ring-red-50">
-                    @if($ngo->profile_photo)
-                        <img src="{{ asset('storage/' . $ngo->profile_photo) }}" class="w-full h-full object-cover rounded-3xl">
-                    @else
-                        {{ substr($ngo->name, 0, 1) }}
-                    @endif
+    <div class="min-h-screen bg-gray-50 py-10">
+        <div class="mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div class="overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm">
+                <div class="relative bg-red-700 px-6 py-8 sm:px-8 sm:py-10">
+                    <div class="absolute inset-0 opacity-100"
+                        style="background-image: radial-gradient(rgba(255,255,255,0.08) 1px, transparent 1px); background-size: 20px 20px;">
+                    </div>
+                    <div class="relative flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+                        <div class="flex items-start gap-4 sm:gap-5">
+                            <div
+                                class="flex h-20 w-20 shrink-0 items-center justify-center overflow-hidden rounded-2xl border-4 border-white bg-white shadow-sm">
+                                @if ($ngo->ngo && $ngo->ngo->logo)
+                                    <img src="{{ asset('storage/' . $ngo->ngo->logo) }}" alt="{{ $ngo->name }}"
+                                        class="h-full w-full object-cover">
+                                @elseif ($ngo->profile_photo)
+                                    <img src="{{ asset('storage/' . $ngo->profile_photo) }}" alt="{{ $ngo->name }}"
+                                        class="h-full w-full object-cover">
+                                @else
+                                    <span class="text-2xl font-bold text-red-600">{{ strtoupper(substr($ngo->name, 0, 1)) }}</span>
+                                @endif
+                            </div>
+                            <div class="min-w-0">
+                                <p class="text-xs font-semibold uppercase tracking-[0.2em] text-red-100">Community Circle</p>
+                                <h1 class="mt-2 text-2xl font-bold text-white sm:text-3xl">{{ $ngo->name }}</h1>
+                                <p class="mt-2 max-w-2xl text-sm text-red-50/90">
+                                    A shared space for supporters, volunteers, and followers to ask questions, exchange ideas,
+                                    and stay close to {{ $ngo->name }}.
+                                </p>
+                                <div class="mt-4 flex flex-wrap items-center gap-3 text-sm text-red-50">
+                                    @if ($ngo->ngo && $ngo->ngo->category)
+                                        <span class="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 font-medium">
+                                            {{ $ngo->ngo->category }}
+                                        </span>
+                                    @endif
+                                    <span class="inline-flex items-center gap-2 text-red-100">
+                                        <i class="fas fa-comments text-red-200"></i>
+                                        <span class="font-semibold text-white">{{ $threads->count() }}</span>
+                                        <span>{{ \Illuminate\Support\Str::plural('thread', $threads->count()) }}</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex w-full flex-col gap-3 sm:flex-row lg:w-auto">
+                            <a href="{{ route('common.ngo.profile', $ngo->id) }}"
+                                class="inline-flex items-center justify-center gap-2 rounded-xl border border-white/20 bg-white/10 px-5 py-2.5 text-sm font-medium text-white transition-colors duration-200 hover:bg-white/15">
+                                <span class="iconify" data-icon="fluent:person-accounts-20-filled"></span>
+                                NGO Profile
+                            </a>
+                            <button type="button" onclick="document.getElementById('newThreadModal').classList.remove('hidden')"
+                                class="inline-flex items-center justify-center gap-2 rounded-xl bg-white px-5 py-2.5 text-sm font-semibold text-red-600 transition-colors duration-200 hover:bg-red-50 active:scale-95">
+                                <span class="iconify" data-icon="fluent:add-circle-20-filled"></span>
+                                Start Discussion
+                            </button>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <h1 class="text-2xl font-black text-gray-900 mb-1">{{ $ngo->name }}</h1>
-                    <p class="text-sm text-gray-400 font-bold uppercase tracking-widest flex items-center gap-2">
-                        <span class="iconify text-red-500" data-icon="fluent:people-community-20-filled"></span>
-                        Community Circle
-                    </p>
+
+                <div class="grid gap-6 border-b border-gray-100 bg-gray-50 px-6 py-5 sm:grid-cols-3 sm:px-8">
+                    <div class="rounded-2xl border border-gray-100 bg-white p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Open Threads</p>
+                        <p class="mt-2 text-2xl font-bold text-gray-900">{{ $threads->count() }}</p>
+                        <p class="mt-1 text-xs text-gray-400">Current conversations in this circle.</p>
+                    </div>
+                    <div class="rounded-2xl border border-gray-100 bg-white p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Replies Shared</p>
+                        <p class="mt-2 text-2xl font-bold text-gray-900">{{ $threads->sum(fn($thread) => $thread->replies->count()) }}</p>
+                        <p class="mt-1 text-xs text-gray-400">Community responses across all discussions.</p>
+                    </div>
+                    <div class="rounded-2xl border border-gray-100 bg-white p-4">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-gray-400">Latest Activity</p>
+                        <p class="mt-2 text-sm font-semibold text-gray-900">
+                            {{ optional($threads->first())->created_at?->diffForHumans() ?? 'No activity yet' }}
+                        </p>
+                        <p class="mt-1 text-xs text-gray-400">Most recent thread started in this circle.</p>
+                    </div>
+                </div>
+
+                <div class="px-6 py-6 sm:px-8">
+                    <div class="mb-5 flex items-center justify-between gap-4">
+                        <div>
+                            <h2 class="text-lg font-bold text-gray-900">Discussion Board</h2>
+                            <p class="mt-1 text-sm text-gray-400">Browse community questions, ideas, and updates.</p>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4">
+                        @if ($threads->count() > 0)
+                            @foreach ($threads as $thread)
+                                <a href="{{ route('common.circles.show', $thread->id) }}"
+                                    class="group block rounded-2xl border border-gray-100 bg-white p-5 transition-all duration-200 hover:border-red-100 hover:shadow-md">
+                                    <div class="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                        <div class="min-w-0 flex-1">
+                                            <div class="mb-3 flex flex-wrap items-center gap-2">
+                                                <span class="rounded-full bg-red-50 px-2.5 py-1 text-xs font-semibold uppercase tracking-wide text-red-600">
+                                                    Discussion
+                                                </span>
+                                                <span class="text-xs text-gray-400">{{ $thread->created_at->diffForHumans() }}</span>
+                                            </div>
+                                            <h3 class="text-lg font-semibold text-gray-900 transition-colors duration-200 group-hover:text-red-600">
+                                                {{ $thread->title }}
+                                            </h3>
+                                            <p class="mt-2 line-clamp-2 text-sm leading-relaxed text-gray-500">
+                                                {{ $thread->content }}
+                                            </p>
+                                        </div>
+
+                                        <div class="flex items-center gap-3 sm:justify-end">
+                                            <div class="flex -space-x-2">
+                                                @foreach ($thread->replies->take(3) as $reply)
+                                                    <div
+                                                        class="flex h-8 w-8 items-center justify-center overflow-hidden rounded-full border-2 border-white bg-gray-100 text-xs font-semibold text-gray-500">
+                                                        @if ($reply->user->profile_photo)
+                                                            <img src="{{ asset('storage/' . $reply->user->profile_photo) }}"
+                                                                class="h-full w-full object-cover" alt="{{ $reply->user->name }}">
+                                                        @else
+                                                            {{ strtoupper(substr($reply->user->name, 0, 1)) }}
+                                                        @endif
+                                                    </div>
+                                                @endforeach
+                                                @if ($thread->replies->count() > 3)
+                                                    <div
+                                                        class="flex h-8 w-8 items-center justify-center rounded-full border-2 border-white bg-gray-50 text-[10px] font-semibold text-gray-500">
+                                                        +{{ $thread->replies->count() - 3 }}
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="text-right">
+                                                <p class="text-sm font-semibold text-gray-900">{{ $thread->replies->count() }}</p>
+                                                <p class="text-xs uppercase tracking-wide text-gray-400">
+                                                    {{ \Illuminate\Support\Str::plural('Reply', $thread->replies->count()) }}
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="mt-4 flex items-center justify-between border-t border-gray-100 pt-4">
+                                        <div class="flex min-w-0 items-center gap-3">
+                                            <div
+                                                class="flex h-9 w-9 items-center justify-center overflow-hidden rounded-xl bg-gray-50 text-sm font-semibold text-gray-500">
+                                                @if ($thread->user->profile_photo)
+                                                    <img src="{{ asset('storage/' . $thread->user->profile_photo) }}"
+                                                        class="h-full w-full object-cover" alt="{{ $thread->user->name }}">
+                                                @else
+                                                    {{ strtoupper(substr($thread->user->name, 0, 1)) }}
+                                                @endif
+                                            </div>
+                                            <div class="min-w-0">
+                                                <p class="truncate text-sm font-medium text-gray-900">{{ $thread->user->name }}</p>
+                                                <p class="text-xs text-gray-400">Started this conversation</p>
+                                            </div>
+                                        </div>
+                                        <span class="iconify text-lg text-gray-300 transition-colors duration-200 group-hover:text-red-500"
+                                            data-icon="fluent:chevron-right-20-filled"></span>
+                                    </div>
+                                </a>
+                            @endforeach
+                        @else
+                            <div class="rounded-2xl border border-dashed border-gray-200 bg-gray-50 px-6 py-14 text-center">
+                                <div class="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-white text-gray-300 shadow-sm">
+                                    <span class="iconify text-2xl" data-icon="fluent:chat-bubbles-question-24-regular"></span>
+                                </div>
+                                <h3 class="mt-4 text-lg font-semibold text-gray-900">No discussions yet</h3>
+                                <p class="mt-2 text-sm text-gray-400">
+                                    Start the first thread and give this community a place to connect.
+                                </p>
+                                <button type="button"
+                                    onclick="document.getElementById('newThreadModal').classList.remove('hidden')"
+                                    class="mt-6 inline-flex items-center justify-center rounded-xl bg-red-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors duration-200 hover:bg-red-600 active:scale-95">
+                                    Start Discussion
+                                </button>
+                            </div>
+                        @endif
+                    </div>
                 </div>
             </div>
-            
-            <button onclick="document.getElementById('newThreadModal').classList.remove('hidden')" 
-                    class="relative px-6 py-3 bg-red-600 text-white text-xs font-black uppercase tracking-widest rounded-2xl shadow-xl shadow-red-100 hover:bg-red-700 transition-all flex items-center gap-2">
-                <span class="iconify text-lg" data-icon="fluent:add-circle-20-filled"></span>
-                Start Discussion
-            </button>
-        </div>
-
-        <!-- Threads List -->
-        <div class="space-y-4">
-            @if($threads->count() > 0)
-                @foreach($threads as $thread)
-                    <a href="{{ route('common.circles.show', $thread->id) }}" 
-                       class="block bg-white p-6 rounded-3xl border border-gray-100 shadow-sm hover:shadow-md hover:scale-[1.01] transition-all group">
-                        <div class="flex items-start justify-between gap-4">
-                            <div class="flex-1">
-                                <span class="text-[9px] font-black text-red-500 uppercase tracking-widest bg-red-50 px-2 py-0.5 rounded-full mb-3 inline-block">
-                                    Discussion
-                                </span>
-                                <h3 class="text-lg font-bold text-gray-900 group-hover:text-red-600 transition-colors mb-2">{{ $thread->title }}</h3>
-                                <p class="text-sm text-gray-500 font-medium line-clamp-2 leading-relaxed">
-                                    {{ $thread->content }}
-                                </p>
-                            </div>
-                            <div class="flex flex-col items-end gap-3">
-                                <div class="flex -space-x-2">
-                                    @foreach($thread->replies->take(3) as $reply)
-                                        <div class="w-7 h-7 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center overflow-hidden">
-                                            @if($reply->user->profile_photo)
-                                                <img src="{{ asset('storage/' . $reply->user->profile_photo) }}" class="w-full h-full object-cover">
-                                            @else
-                                                <span class="text-[8px] font-bold text-gray-400">{{ substr($reply->user->name, 0, 1) }}</span>
-                                            @endif
-                                        </div>
-                                    @endforeach
-                                    @if($thread->replies->count() > 3)
-                                        <div class="w-7 h-7 rounded-full bg-gray-50 border-2 border-white flex items-center justify-center text-[8px] font-black text-gray-400">
-                                            +{{ $thread->replies->count() - 3 }}
-                                        </div>
-                                    @endif
-                                </div>
-                                <span class="text-[10px] font-black text-gray-300 uppercase tracking-widest">
-                                    {{ $thread->replies->count() }} {{ Str::plural('Reply', $thread->replies->count()) }}
-                                </span>
-                            </div>
-                        </div>
-                        <div class="mt-4 pt-4 border-t border-gray-50 flex items-center justify-between">
-                            <div class="flex items-center gap-2">
-                                <div class="w-5 h-5 rounded-full bg-gray-100 flex items-center justify-center text-[8px] font-bold text-gray-400">
-                                    @if($thread->user->profile_photo)
-                                        <img src="{{ asset('storage/' . $thread->user->profile_photo) }}" class="w-full h-full object-cover rounded-full">
-                                    @else
-                                        {{ substr($thread->user->name, 0, 1) }}
-                                    @endif
-                                </div>
-                                <span class="text-[10px] font-bold text-gray-400">By {{ $thread->user->name }}</span>
-                            </div>
-                            <span class="text-[10px] font-bold text-gray-300">{{ $thread->created_at->diffForHumans() }}</span>
-                        </div>
-                    </a>
-                @endforeach
-            @else
-                <div class="bg-white rounded-[2.5rem] p-16 text-center border border-gray-100 shadow-sm">
-                    <span class="iconify text-4xl text-gray-200 mx-auto mb-4" data-icon="fluent:chat-bubbles-question-24-regular"></span>
-                    <h3 class="text-xl font-bold text-gray-900 mb-1">Circle is quiet...</h3>
-                    <p class="text-sm text-gray-400 font-medium mb-8">Start the first discussion to engage with this NGO's community.</p>
-                    <button onclick="document.getElementById('newThreadModal').classList.remove('hidden')" 
-                            class="px-8 py-4 bg-gray-50 text-gray-400 text-xs font-black uppercase tracking-widest rounded-2xl hover:bg-red-50 hover:text-red-500 transition-all">
-                        Define Topic
-                    </button>
-                </div>
-            @endif
         </div>
     </div>
-</div>
 
-<!-- New Thread Modal -->
-<div id="newThreadModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-        <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" onclick="document.getElementById('newThreadModal').classList.add('hidden')"></div>
-        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-        <div class="inline-block align-bottom bg-white rounded-[2.5rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
-            <form action="{{ route('common.circles.storeThread', $ngo->id) }}" method="POST" class="p-10">
-                @csrf
-                <div class="mb-8">
-                    <h3 class="text-2xl font-black text-gray-900 mb-2">Start a Discussion</h3>
-                    <p class="text-sm text-gray-500 font-medium">Ask a question or share an idea with the community.</p>
-                </div>
-                <div class="space-y-6">
-                    <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Thread Title</label>
-                        <input type="text" name="title" required placeholder="What would you like to discuss?" 
-                               class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all font-bold text-gray-800 placeholder-gray-300">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Content</label>
-                        <textarea name="content" rows="4" required placeholder="Provide some context for your discussion..." 
-                                  class="w-full px-6 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all font-medium text-gray-800 placeholder-gray-300"></textarea>
-                    </div>
-                </div>
-                <div class="mt-10 flex gap-4">
-                    <button type="button" onclick="document.getElementById('newThreadModal').classList.add('hidden')"
-                            class="flex-1 px-8 py-4 bg-gray-50 text-gray-400 font-bold rounded-2xl hover:bg-gray-100 transition-colors">Cancel</button>
-                    <button type="submit" 
-                            class="flex-1 px-8 py-4 bg-red-600 text-white font-bold rounded-2xl shadow-xl shadow-red-100 hover:bg-red-700 transition-all transform active:scale-95">Post Thread</button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 @endsection
+
+@push('modals')
+    <div id="newThreadModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog"
+        aria-modal="true">
+        <div class="fixed inset-0 bg-slate-900/60 transition-opacity"
+            onclick="document.getElementById('newThreadModal').classList.add('hidden')"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div
+                    class="relative w-full transform overflow-hidden rounded-2xl border border-gray-100 bg-white text-left shadow-xl transition-all sm:my-8 sm:max-w-lg">
+                    <form action="{{ route('common.circles.storeThread', $ngo->id) }}" method="POST" class="p-6 sm:p-7">
+                        @csrf
+                        <div class="mb-6">
+                            <h3 id="modal-title" class="text-xl font-bold text-gray-900">Start a discussion</h3>
+                            <p class="mt-1 text-sm text-gray-500">Ask a question, share an update, or invite community input.</p>
+                        </div>
+
+                        <div class="space-y-5">
+                            <div>
+                                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-400">Thread Title</label>
+                                <input type="text" name="title" required placeholder="What would you like to discuss?"
+                                    class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-800 placeholder-gray-300 transition-colors duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100">
+                            </div>
+                            <div>
+                                <label class="mb-2 block text-xs font-semibold uppercase tracking-wide text-gray-400">Content</label>
+                                <textarea name="content" rows="5" required placeholder="Provide some context for your discussion..."
+                                    class="w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm font-medium text-gray-800 placeholder-gray-300 transition-colors duration-200 focus:border-red-500 focus:outline-none focus:ring-2 focus:ring-red-100"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="mt-6 flex flex-col gap-3 sm:flex-row">
+                            <button type="button" onclick="document.getElementById('newThreadModal').classList.add('hidden')"
+                                class="flex-1 rounded-xl border border-gray-200 px-4 py-3 text-sm font-medium text-gray-500 transition-colors duration-200 hover:bg-gray-50">
+                                Cancel
+                            </button>
+                            <button type="submit"
+                                class="flex-1 rounded-xl bg-red-500 px-4 py-3 text-sm font-semibold text-white transition-colors duration-200 hover:bg-red-600 active:scale-95">
+                                Post Thread
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+@endpush

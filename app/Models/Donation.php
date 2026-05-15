@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Jobs\ComputeUserRecommendations;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -12,10 +13,19 @@ class Donation extends Model
     protected $fillable = [
         'user_id',
         'ngo_id',
-        'transaction_uuid',
         'donation_amount',
-        'status',
     ];
+
+    protected static function booted(): void
+    {
+        static::created(function (Donation $donation) {
+            ComputeUserRecommendations::dispatch($donation->user_id)->afterCommit();
+        });
+
+        static::deleted(function (Donation $donation) {
+            ComputeUserRecommendations::dispatch($donation->user_id)->afterCommit();
+        });
+    }
 
     public function user()
     {
@@ -25,10 +35,5 @@ class Donation extends Model
     public function ngo()
     {
         return $this->belongsTo(User::class, 'ngo_id');
-    }
-
-    public function payments()
-    {
-        return $this->hasMany(DonationHasPayment::class, 'donation_id');
     }
 }

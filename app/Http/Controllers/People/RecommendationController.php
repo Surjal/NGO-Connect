@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\People;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ComputeUserRecommendations;
+use App\Models\UserRecommendation;
 use App\Services\RecommendationService;
 use Illuminate\Http\Request;
 
@@ -26,32 +28,25 @@ class RecommendationController extends Controller
         /** @var \App\Models\User $user */
         $user = auth()->user();
 
-        // Get recommended NGOs, Events, and Posts
-        $recommendedNgos = $this->recommendationService->recommendNgosForUser($user, 6);
-        $recommendedEvents = $this->recommendationService->recommendEventsForUser($user, 6);
-        $recommendedPosts = $this->recommendationService->recommendPostsForUser($user, 6);
+        $stored = UserRecommendation::where('user_id', $user->id)->first();
 
-        // Clear previous recommendations for this user to keep the DB clean
-        \App\Models\RecommendationLog::where('user_id', $user->id)->delete();
-
-        // Store current recommendations in the database
-        $this->recommendationService->logRecommendations($user, $recommendedNgos, \App\Models\Ngo::class);
-        $this->recommendationService->logRecommendations($user, $recommendedEvents, \App\Models\Event::class);
-        $this->recommendationService->logRecommendations($user, $recommendedPosts, \App\Models\Post::class);
-
-        // Optional: Get the user's interest profile to display what the AI learned
-        $interestProfile = $this->recommendationService->getUserInterestProfile($user);
-        $topCategory = null;
-        if (!empty($interestProfile['preferred_categories'])) {
-            $topCategory = array_key_first($interestProfile['preferred_categories']);
+        if (!$stored) {
+            ComputeUserRecommendations::dispatchSync($user->id);
+            $stored = UserRecommendation::where('user_id', $user->id)->first();
         }
 
-        return view('people.recommendations.index', compact(
-            'recommendedNgos', 
-            'recommendedEvents',
-            'recommendedPosts',
-            'interestProfile',
-            'topCategory'
-        ));
+        $recommendationData = $stored
+            ? $this->recommendationService->loadStoredRecommendations($stored)
+            : [
+                'recommendedNgos' => collect(),
+                'recommendedEvents' => collect(),
+                'recommendedPosts' => collect(),
+                'topCategory' => null,
+            ];
+
+        return view('people.recommendations.index', [
+            'stored' => $stored,
+            ...$recommendationData,
+        ]);
     }
 }

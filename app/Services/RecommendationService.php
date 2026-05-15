@@ -11,6 +11,7 @@ use App\Models\PostHasComments;
 use App\Models\PostHasLikes;
 use App\Models\RecommendationLog;
 use App\Models\User;
+use App\Models\UserRecommendation;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -130,7 +131,6 @@ class RecommendationService
         // ----- 2. Donations (weight: 5) -----
         // Note: donations.ngo_id references users.id (the NGO user account)
         $donatedNgoUserIds = Donation::where('user_id', $user->id)
-            ->where('status', 'completed')
             ->pluck('ngo_id')
             ->unique();
 
@@ -234,6 +234,11 @@ class RecommendationService
         // Get IDs of NGOs user already follows (to penalize)
         $followedNgoIds = Follows::where('user_id', $user->id)->pluck('ngo_id');
         $followedNgoModelIds = Ngo::whereIn('user_id', $followedNgoIds)->pluck('id')->toArray();
+        $donatedCategories = $this->getDonatedCategories($user);
+        $followedCategories = $this->getFollowedCategories($user);
+        $likedCategories = $this->getEngagedPostCategories($user, 'post_has_likes');
+        $commentedCategories = $this->getEngagedPostCategories($user, 'post_has_comments');
+        $volunteerCategories = $this->getVolunteeredCategories($user);
 
         // Get all verified, non-suspended NGOs with eager-loaded counts
         $ngos = $this->applyVerifiedNgoConstraint(Ngo::query())
@@ -260,33 +265,28 @@ class RecommendationService
             }
 
             // --- Donated to similar category ---
-            $donatedCategories = $this->getDonatedCategories($user);
             if (!empty($ngo->category) && in_array($ngo->category, $donatedCategories)) {
                 $score += self::SCORE_DONATED_SIMILAR;
                 $reasons[] = "You donated to similar {$ngo->category} NGOs";
             }
 
             // --- Followed similar category ---
-            $followedCategories = $this->getFollowedCategories($user);
             if (!empty($ngo->category) && in_array($ngo->category, $followedCategories)) {
                 $score += self::SCORE_FOLLOWED_SIMILAR;
                 $reasons[] = "You follow similar {$ngo->category} organizations";
             }
 
             // --- Liked posts from similar ---
-            $likedCategories = $this->getEngagedPostCategories($user, 'post_has_likes');
             if (!empty($ngo->category) && in_array($ngo->category, $likedCategories)) {
                 $score += self::SCORE_LIKED_SIMILAR;
             }
 
             // --- Commented on similar ---
-            $commentedCategories = $this->getEngagedPostCategories($user, 'post_has_comments');
             if (!empty($ngo->category) && in_array($ngo->category, $commentedCategories)) {
                 $score += self::SCORE_COMMENTED_SIMILAR;
             }
 
             // --- Volunteered for events of similar NGOs ---
-            $volunteerCategories = $this->getVolunteeredCategories($user);
             if (!empty($ngo->category) && in_array($ngo->category, $volunteerCategories)) {
                 $score += self::SCORE_VOLUNTEERED_NGO;
                 $reasons[] = "You volunteered in related {$ngo->category} events";
@@ -356,6 +356,8 @@ class RecommendationService
             ->with('ngo')
             ->withCount('volunteers')
             ->get();
+        $volunteerCategories = $this->getVolunteeredCategories($user);
+        $engagedNgoUserIds = $this->getEngagedNgoUserIds($user);
 
         $scoredEvents = [];
 
@@ -392,7 +394,6 @@ class RecommendationService
             }
 
             // --- User joined similar past events ---
-            $volunteerCategories = $this->getVolunteeredCategories($user);
             if ($eventCategory && in_array($eventCategory, $volunteerCategories)) {
                 $score += self::SCORE_VOLUNTEERED_SIMILAR;
                 $reasons[] = "Similar to events you've volunteered in";
@@ -400,7 +401,6 @@ class RecommendationService
 
             // --- User engaged with posts from this event's NGO ---
             if ($event->user_id) {
-                $engagedNgoUserIds = $this->getEngagedNgoUserIds($user);
                 if (in_array($event->user_id, $engagedNgoUserIds)) {
                     $score += self::SCORE_ENGAGED_NGO_EVENTS;
                     $reasons[] = "You engage with this NGO's posts";
@@ -636,6 +636,56 @@ class RecommendationService
         }
     }
 
+    /**
+     * Compute, log, and persist recommendation references for fast reads.
+     */
+    public function computeAndStoreRecommendations(User $user, int $limit = 6): UserRecommendation
+    {
+        $user = $user->fresh();
+
+        $recommendedNgos = $this->recommendNgosForUser($user, $limit);
+        $recommendedEvents = $this->recommendEventsForUser($user, $limit);
+        $recommendedPosts = $this->recommendPostsForUser($user, $limit);
+
+        RecommendationLog::where('user_id', $user->id)->delete();
+        $this->logRecommendations($user, $recommendedNgos, Ngo::class);
+        $this->logRecommendations($user, $recommendedEvents, Event::class);
+        $this->logRecommendations($user, $recommendedPosts, Post::class);
+
+        $interestProfile = $this->getUserInterestProfile($user);
+        $topCategory = !empty($interestProfile['preferred_categories'])
+            ? array_key_first($interestProfile['preferred_categories'])
+            : null;
+
+        return UserRecommendation::updateOrCreate(
+            ['user_id' => $user->id],
+            [
+                'recommendations' => [
+                    'ngos' => $this->serializeRecommendations($recommendedNgos),
+                    'events' => $this->serializeRecommendations($recommendedEvents),
+                    'posts' => $this->serializeRecommendations($recommendedPosts),
+                    'top_category' => $topCategory,
+                ],
+                'computed_at' => now(),
+            ]
+        );
+    }
+
+    /**
+     * Load stored recommendation references and hydrate them in bulk.
+     */
+    public function loadStoredRecommendations(UserRecommendation $stored): array
+    {
+        $payload = $stored->recommendations ?? [];
+
+        return [
+            'recommendedNgos' => $this->hydrateNgoRecommendations($payload['ngos'] ?? []),
+            'recommendedEvents' => $this->hydrateEventRecommendations($payload['events'] ?? []),
+            'recommendedPosts' => $this->hydratePostRecommendations($payload['posts'] ?? []),
+            'topCategory' => $payload['top_category'] ?? null,
+        ];
+    }
+
 
     /*
     |--------------------------------------------------------------------------
@@ -657,12 +707,21 @@ class RecommendationService
         $scores[$ngoId] = ($scores[$ngoId] ?? 0) + $weight;
     }
 
+    /** Store only the information needed to rebuild recommendation cards fast. */
+    private function serializeRecommendations(Collection $items): array
+    {
+        return $items->map(fn ($item) => [
+            'id' => $item->id,
+            'score' => $item->recommendation_score,
+            'reason' => $item->recommendation_reason,
+        ])->values()->all();
+    }
+
     /** Get categories of NGOs the user has donated to */
     private function getDonatedCategories(User $user): array
     {
         return Ngo::whereIn('ngos.user_id',
             Donation::where('user_id', $user->id)
-                ->where('status', 'completed')
                 ->pluck('ngo_id')
         )->pluck('category')->filter()->unique()->toArray();
     }
@@ -722,6 +781,75 @@ class RecommendationService
             ->pluck('posts.user_id');
 
         return $liked->merge($commented)->unique()->toArray();
+    }
+
+    /** Hydrate stored NGO recommendations while preserving stored order and scores. */
+    private function hydrateNgoRecommendations(array $items): Collection
+    {
+        $ids = collect($items)->pluck('id')->all();
+        if (empty($ids)) {
+            return collect();
+        }
+
+        $models = $this->applyVerifiedNgoConstraint(Ngo::query())
+            ->whereIn('id', $ids)
+            ->get()
+            ->keyBy('id');
+
+        return $this->attachStoredMetadata($items, $models);
+    }
+
+    /** Hydrate stored event recommendations while preserving stored order and scores. */
+    private function hydrateEventRecommendations(array $items): Collection
+    {
+        $ids = collect($items)->pluck('id')->all();
+        if (empty($ids)) {
+            return collect();
+        }
+
+        $models = Event::with('ngo')
+            ->whereIn('id', $ids)
+            ->get()
+            ->keyBy('id');
+
+        return $this->attachStoredMetadata($items, $models);
+    }
+
+    /** Hydrate stored post recommendations while preserving stored order and scores. */
+    private function hydratePostRecommendations(array $items): Collection
+    {
+        $ids = collect($items)->pluck('id')->all();
+        if (empty($ids)) {
+            return collect();
+        }
+
+        $models = Post::with(['user.ngo', 'medias'])
+            ->withCount(['likes', 'comments'])
+            ->whereIn('id', $ids)
+            ->get()
+            ->keyBy('id');
+
+        return $this->attachStoredMetadata($items, $models);
+    }
+
+    /** Attach stored score metadata to hydrated models. */
+    private function attachStoredMetadata(array $items, Collection $models): Collection
+    {
+        return collect($items)
+            ->map(function (array $item) use ($models) {
+                $model = $models->get($item['id']);
+
+                if (!$model) {
+                    return null;
+                }
+
+                $model->recommendation_score = (float) $item['score'];
+                $model->recommendation_reason = $item['reason'] ?? 'Recommended for you';
+
+                return $model;
+            })
+            ->filter()
+            ->values();
     }
 
     /**

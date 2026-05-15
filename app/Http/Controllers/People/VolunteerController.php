@@ -3,10 +3,12 @@
 namespace App\Http\Controllers\People;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ComputeUserRecommendations;
 use App\Models\Event;
 use App\Models\EventHasVolunteer;
 use App\Models\User;
 use App\Notifications\VolunteerRegistered;
+use App\Services\ChurnPredictionService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,7 +66,7 @@ class VolunteerController extends Controller
         return view('people.volunteer.show', compact('events'));
     }
 
-    public function apply(Request $request)
+    public function apply(Request $request, ChurnPredictionService $churnPredictionService)
     {
         $request->validate([
             'event_id' => 'required|exists:events,id',
@@ -96,6 +98,8 @@ class VolunteerController extends Controller
 
         // Register volunteer with pending status
         $event->volunteers()->attach($user->id, ['status' => 'pending']);
+        $churnPredictionService->refreshVolunteerNgoPairIfEligible($user->id, $event->user_id);
+        ComputeUserRecommendations::dispatch($user->id)->afterCommit();
 
         // Notify the NGO owner - wrapped in try-catch to prevent mail errors from breaking registration
         try {

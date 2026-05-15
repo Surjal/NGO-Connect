@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\People;
 
 use App\Http\Controllers\Controller;
+use App\Jobs\ComputeUserRecommendations;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -17,7 +18,7 @@ class ProfileController extends Controller
                 $query->latest()->limit(5);
             },
             'donations' => function($query) {
-                $query->with('ngo')->where('status', 'completed')->latest()->limit(5);
+                $query->with('ngo')->latest()->limit(5);
             },
             'certificates.event',
             'badges'
@@ -25,8 +26,8 @@ class ProfileController extends Controller
         
         $stats = [
             'volunteering_count' => $user->volunteeredEvents()->wherePivot('status', 'accepted')->count(),
-            'donations_count' => $user->donations()->where('status', 'completed')->count(),
-            'total_donated' => $user->donations()->where('status', 'completed')->sum('donation_amount'),
+            'donations_count' => $user->donations()->count(),
+            'total_donated' => $user->donations()->sum('donation_amount'),
         ];
 
         return view('people.profile.show', compact('user', 'stats'));
@@ -41,6 +42,8 @@ class ProfileController extends Controller
     public function update(Request $request)
     {
         $user = Auth::user();
+        $preferredCategories = $request->preferred_categories ?? [];
+        $preferredCategoriesChanged = $user->preferred_categories !== $preferredCategories;
 
         $request->validate([
             'name' => 'required|string|max:255',
@@ -52,7 +55,7 @@ class ProfileController extends Controller
 
         $user->name = $request->name;
         $user->location = $request->location;
-        $user->preferred_categories = $request->preferred_categories ?? [];
+        $user->preferred_categories = $preferredCategories;
 
         if ($request->hasFile('profile_photo')) {
             $path = $request->file('profile_photo')->store('profile_photos', 'public');
@@ -60,6 +63,10 @@ class ProfileController extends Controller
         }
 
         $user->save();
+
+        if ($preferredCategoriesChanged) {
+            ComputeUserRecommendations::dispatch($user->id)->afterCommit();
+        }
 
         return redirect()->route('people.profile')->with('success', 'Profile updated successfully.');
     }

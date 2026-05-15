@@ -18,8 +18,8 @@ class DashboardController extends Controller
 
     public function dashboard(){
         $ngoCount = Ngo::count();
-        $userCount = User::count();
-        $pendingNgoApprovals = User::where('role_id',1)->where('verified',0)->count();
+        $userCount = User::where('role_id',2)->count();
+        $pendingNgoApprovals = Ngo::where('verified',0)->count();
         $reportedPosts = PostHasReports::count();
         $totalDonations = Donation::sum('donation_amount');
         return view('admin.dashboard',compact('ngoCount','userCount','pendingNgoApprovals','reportedPosts','totalDonations'));
