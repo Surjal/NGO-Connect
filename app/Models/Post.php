@@ -69,7 +69,7 @@ class Post extends Model
 
     public function likedUsers()
     {
-        return $this->belongsToMany(User::class, 'likes');
+        return $this->belongsToMany(User::class, 'post_has_likes', 'post_id', 'user_id');
     }
 
     // get the comments of the Post

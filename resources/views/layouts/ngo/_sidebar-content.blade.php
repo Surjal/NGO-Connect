@@ -71,18 +71,6 @@
             </a>
         </li>
 
-        {{-- Donations --}}
-        <li>
-            <a href="{{ route('ngo.donations') }}"
-                class="flex items-center space-x-3 px-4 py-3 rounded-xl text-slate-600 hover:bg-white hover:text-primary hover:shadow-sm transition-all duration-300 group
-                {{ request()->routeIs('ngo.donations*') ? 'bg-white shadow-sm text-primary border border-slate-100' : '' }}">
-                <div class="w-9 h-9 bg-red-50 rounded-xl flex items-center justify-center group-hover:bg-red-100 group-hover:rotate-6 transition-all">
-                    <i class="fas fa-heart text-red-500 text-sm"></i>
-                </div>
-                <span class="font-bold text-sm">Donations</span>
-            </a>
-        </li>
-
         {{-- Followers --}}
         <li>
             <a href="{{ route('ngo.followers') }}"

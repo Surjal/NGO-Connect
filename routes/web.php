@@ -2,12 +2,9 @@
 
 use App\Http\Controllers\Auth;
 use App\Http\Controllers\Admin;
-use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Common;
-use App\Http\Controllers\Common\FeedController;
 use App\Http\Controllers\Ngo;
 use App\Http\Controllers\People;
-use App\Http\Controllers\Website;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -34,7 +31,7 @@ Route::get('/', function () {
 
     return redirect()->route('admin.dashboard');
 })->name('root');
-Route::get('user/register', [Admin\UserRegisterController::class, 'showuser'])->name('admin.user.register');
+Route::get('user/register', [Admin\UserController::class, 'index'])->name('admin.user.register');
 
 
 Route::middleware(['auth', 'check.verified'])->group(function () {
@@ -65,16 +62,14 @@ Route::middleware(['auth', 'check.verified'])->group(function () {
         Route::get('/user/all', [Admin\UserController::class, 'getAll'])->name('admin.user.all');
         Route::get('/user/details/{id}', [Admin\UserController::class, 'getDetails'])->name('admin.user.details');
         Route::get('/user/search', [Admin\UserController::class, 'search'])->name('admin.user.search');
-        Route::get('/admin/user', [Admin\UserController::class, 'index'])->name('admin.users');
-        Route::get('/users', [Admin\UserController::class, 'showuser'])->name('admin.users');
+        Route::get('/admin/user', [Admin\UserController::class, 'index'])->name('admin.user.index');
+        Route::get('/users', [Admin\UserController::class, 'showuser'])->name('admin.users.list');
         Route::post('/users', [Admin\UserController::class, 'store'])->name('admin.user.store');
-        Route::get('/users/{id}', [Admin\UserController::class, 'show'])->name('admin.user.show');
+        Route::get('/users/{id}', [Admin\UserController::class, 'show'])->name('admin.users.show');
         Route::delete('/users/{id}', [Admin\UserController::class, 'destroy'])->name('admin.user.delete');
 
         Route::get('/user', [Admin\UserController::class, 'showuser'])->name('admin.user');
 
-        // Routes related to logs
-        Route::get('/log', [Admin\LogController::class, 'showLog'])->name('admin.log');
         Route::post('/suspend-user/{id}', [Admin\UserController::class, 'suspend'])->name('admin.users.suspend');
     });
 
@@ -105,8 +100,6 @@ Route::middleware(['auth', 'check.verified'])->group(function () {
         Route::post('/events/{eventId}/milestones', [Ngo\MilestoneController::class, 'store'])->name('ngo.milestones.store');
         Route::patch('/milestones/{milestoneId}/status', [Ngo\MilestoneController::class, 'updateStatus'])->name('ngo.milestones.update');
         Route::delete('/milestones/{milestoneId}', [Ngo\MilestoneController::class, 'destroy'])->name('ngo.milestones.delete');
-
-        Route::get('/donations', [Ngo\DonationController::class, 'donations'])->name('ngo.donations');
 
         Route::get('/notifications', [Ngo\NotificationController::class, 'notifications'])->name('ngo.notifications');
         Route::post('/notifications/{id}/read', [Ngo\NotificationController::class, 'markAsRead'])->name('ngo.notifications.read');
@@ -151,7 +144,7 @@ Route::middleware(['auth', 'check.verified'])->group(function () {
     Route::middleware('role:1,2')->group(function () {
         Route::get('/feed', [Common\FeedController::class, 'index'])->name('common.feed');
         Route::post('/feed', [Common\FeedController::class, 'create'])->name('common.post.create');
-        Route::get('/ngo/profile/{id}', [Common\NgoProfileController::class, 'index'])->name('common.ngo.profile');
+         Route::get('/ngo/profile/{id}', [Common\NgoProfileController::class, 'index'])->name('common.ngo.profile');
         Route::get('/ngo/profile/{id}/feed', [Common\NgoProfileController::class, 'feed'])->name('common.ngo.profile.feed');
         Route::post('/post/like', [Common\FeedController::class, 'like'])->name('common.post.like');
         Route::post('/post/comment', [Common\FeedController::class, 'comment'])->name('common.post.comment');

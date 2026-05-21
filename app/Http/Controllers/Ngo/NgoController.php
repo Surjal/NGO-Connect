@@ -75,12 +75,6 @@ class NgoController extends Controller
         return view('ngo.volunteers.index');
     }
 
-    public function donations()
-    {
-        // Placeholder for donations listing
-        return view('ngo.donations.index');
-    }
-
     public function notifications()
     {
         $notifications = Auth::user()->notifications()->paginate(10);

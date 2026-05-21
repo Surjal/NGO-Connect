@@ -100,11 +100,6 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function donations()
-    {
-        return $this->hasMany(Donation::class, 'user_id');
-    }
-
     public function certificates()
     {
         return $this->hasMany(Certificate::class);

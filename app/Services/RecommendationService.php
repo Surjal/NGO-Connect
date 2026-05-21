@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Donation;
 use App\Models\Event;
 use App\Models\Follows;
 use App\Models\Ngo;
@@ -28,16 +27,16 @@ use Illuminate\Support\Facades\Log;
  *  HOW IT WORKS (explainable for academic viva):
  *  ─────────────────────────────────────────────
  *  1. INPUT DATA:
- *     - User activity signals: follows, likes, comments, donations, volunteering
+ *     - User activity signals: follows, likes, comments, volunteering
  *
  *  2. INTEREST INFERENCE:
- *     - Each activity is weighted (donation=strongest, like=weakest)
+ *     - Each activity is weighted (volunteering=strongest, like=weakest)
  *     - Activities are aggregated by NGO category to build an interest profile
  *     - Result: a ranked list of categories the user cares about
  *
  *  3. WEIGHTED SCORING:
  *     - Every candidate NGO/Event receives a score based on multiple signals
- *     - Scores are additive: category match, donation similarity, engagement, etc.
+ *     - Scores are additive: category match, engagement, etc.
  *     - Negative scores for already-engaged items (followed NGOs, expired events)
  *
  *  4. OUTPUT:
@@ -58,8 +57,7 @@ class RecommendationService
     | These are used when building the user's interest profile.
     */
     const WEIGHT_PROFILE   = 6;   // Strongest signal — explicit user preference
-    const WEIGHT_DONATION   = 5;   // Very strong signal — user invested money
-    const WEIGHT_VOLUNTEER  = 4;   // Very strong — user invested time
+    const WEIGHT_VOLUNTEER  = 5;   // Very strong — user invested time
     const WEIGHT_FOLLOW     = 3;   // Strong — explicit interest declaration
     const WEIGHT_COMMENT    = 2;   // Medium — active engagement
     const WEIGHT_LIKE       = 1;   // Low-medium — passive engagement
@@ -71,7 +69,6 @@ class RecommendationService
     | These control how much each factor contributes to the final score.
     */
     const SCORE_CATEGORY_MATCH       = 10;
-    const SCORE_DONATED_SIMILAR      = 8;
     const SCORE_EVENT_NGO_MATCH      = 8;
     const SCORE_FOLLOWED_SIMILAR     = 7;
     const SCORE_VOLUNTEERED_SIMILAR  = 7;
@@ -104,7 +101,6 @@ class RecommendationService
             'follows' => 0,
             'likes' => 0,
             'comments' => 0,
-            'donations' => 0,
             'volunteering' => 0,
         ];
 
@@ -128,20 +124,7 @@ class RecommendationService
             $interactionSummary['follows']++;
         }
 
-        // ----- 2. Donations (weight: 5) -----
-        // Note: donations.ngo_id references users.id (the NGO user account)
-        $donatedNgoUserIds = Donation::where('user_id', $user->id)
-            ->pluck('ngo_id')
-            ->unique();
-
-        $donatedNgos = Ngo::whereIn('ngos.user_id', $donatedNgoUserIds)->get(['ngos.id', 'ngos.user_id', 'ngos.category']);
-        foreach ($donatedNgos as $ngo) {
-            $this->addCategoryScore($categoryScores, $ngo->category, self::WEIGHT_DONATION);
-            $this->addNgoScore($ngoScores, $ngo->id, self::WEIGHT_DONATION);
-            $interactionSummary['donations']++;
-        }
-
-        // ----- 3. Volunteered Events (weight: 4) -----
+        // ----- 2. Volunteered Events (weight: 5) -----
         $volunteeredEvents = Event::whereIn('events.id', function ($q) use ($user) {
             $q->select('event_id')->from('event_has_volunteers')->where('user_id', $user->id);
         })->with('ngo')->get();
@@ -207,12 +190,11 @@ class RecommendationService
      *
      * Scoring formula per NGO:
      * +10  category matches user interest
-     * +8   user donated to NGOs with same category
      * +7   user follows NGOs with same category
      * +6   user liked posts from same-category NGOs
      * +5   user commented on same-category NGOs
      * +4   user volunteered in events from same-category NGOs
-     * +3   NGO is trending (popular by follower/donation count)
+     * +3   NGO is trending (popular by follower count)
      * -100 user already follows this NGO
      *
      * @param  User  $user
@@ -234,7 +216,6 @@ class RecommendationService
         // Get IDs of NGOs user already follows (to penalize)
         $followedNgoIds = Follows::where('user_id', $user->id)->pluck('ngo_id');
         $followedNgoModelIds = Ngo::whereIn('user_id', $followedNgoIds)->pluck('id')->toArray();
-        $donatedCategories = $this->getDonatedCategories($user);
         $followedCategories = $this->getFollowedCategories($user);
         $likedCategories = $this->getEngagedPostCategories($user, 'post_has_likes');
         $commentedCategories = $this->getEngagedPostCategories($user, 'post_has_comments');
@@ -262,12 +243,6 @@ class RecommendationService
                 $categoryStrength = $preferredCategories[$ngo->category];
                 $score += self::SCORE_CATEGORY_MATCH * min($categoryStrength / 5, 3);
                 $reasons[] = "Matches your interest in {$ngo->category}";
-            }
-
-            // --- Donated to similar category ---
-            if (!empty($ngo->category) && in_array($ngo->category, $donatedCategories)) {
-                $score += self::SCORE_DONATED_SIMILAR;
-                $reasons[] = "You donated to similar {$ngo->category} NGOs";
             }
 
             // --- Followed similar category ---
@@ -567,15 +542,15 @@ class RecommendationService
      * ======================================================================
      *
      * Returns popular NGOs for users with no activity history.
-     * Popularity = follower count + donation count.
+     * Popularity = follower count.
      */
     public function getTrendingNgos(int $limit = 6): Collection
     {
         $ngos = $this->applyVerifiedNgoConstraint(Ngo::query())
-            ->withCount(['followers', 'donations'])
+            ->withCount('followers')
             ->get()
             ->map(function ($ngo) {
-                $ngo->recommendation_score = $ngo->followers_count + $ngo->donations_count;
+                $ngo->recommendation_score = $ngo->followers_count;
                 $ngo->recommendation_reason = 'Trending in the community';
                 return $ngo;
             })
@@ -715,15 +690,6 @@ class RecommendationService
             'score' => $item->recommendation_score,
             'reason' => $item->recommendation_reason,
         ])->values()->all();
-    }
-
-    /** Get categories of NGOs the user has donated to */
-    private function getDonatedCategories(User $user): array
-    {
-        return Ngo::whereIn('ngos.user_id',
-            Donation::where('user_id', $user->id)
-                ->pluck('ngo_id')
-        )->pluck('category')->filter()->unique()->toArray();
     }
 
     /** Get categories of NGOs the user follows */

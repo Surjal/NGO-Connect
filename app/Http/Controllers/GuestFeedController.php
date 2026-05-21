@@ -2,18 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Controllers\Common\FeedController;
 use App\Models\Post;
-use Illuminate\Http\Request;
+use App\Services\FeedService;
 
 class GuestFeedController extends Controller
 {
-    protected $feedController;
-
-    public function __construct(FeedController $feedController)
-    {
-        $this->feedController = $feedController;
-    }
+    public function __construct(
+        private readonly FeedService $feedService
+    ) {}
 
     public function index()
     {
@@ -22,7 +18,7 @@ class GuestFeedController extends Controller
             ->latest('created_at')
             ->get();
 
-        $sortedPosts = $this->feedController->sortPostsForFeed($posts, null, 3);
+        $sortedPosts = $this->feedService->sortPostsForFeed($posts, null, 3);
 
         return view('guest-feed', ['posts' => $sortedPosts]);
     }

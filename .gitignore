@@ -1,7 +1,7 @@
 /.phpunit.cache
 /node_modules
-/public/build
 /public/hot
+/public/build
 /public/storage
 /storage/*.key
 /vendor
@@ -17,3 +17,6 @@ yarn-error.log
 /.fleet
 /.idea
 /.vscode
+.agents
+PROJECT_EXPLANATION.md
+skills-lock.json

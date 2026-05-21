@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->text('description')->nullable();
             $table->string('icon')->nullable(); // Path to icon or icon class
-            $table->string('requirement_type'); // e.g., 'volunteer_hours', 'donation_amount'
+            $table->string('requirement_type'); // e.g., 'volunteer_hours', 'events_attended'
             $table->integer('requirement_value');
             $table->timestamps();
         });

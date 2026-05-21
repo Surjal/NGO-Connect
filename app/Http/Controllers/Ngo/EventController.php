@@ -54,12 +54,23 @@ class EventController extends Controller
 
     public function showEventDetails($id)
     {
-        $event = Event::findOrFail($id);
+        $event = Event::with(['attendances.user', 'volunteers'])->findOrFail($id);
         $currentDate = now();
         if ($event->end_date && $event->end_date < $currentDate) {
             $event['timing'] = 'old';
         }
-        return view('ngo.events.details', compact('event'));
+
+        $checkedInCount = $event->attendances->count();
+        $acceptedCount = $event->volunteers()->wherePivot('status', 'accepted')->count();
+        $checkedInVolunteers = $event->attendances->map(function ($attendance) {
+            return [
+                'name' => $attendance->user->name ?? 'Unknown',
+                'email' => $attendance->user->email ?? '',
+                'checked_in_at' => $attendance->checked_in_at,
+            ];
+        });
+
+        return view('ngo.events.details', compact('event', 'checkedInCount', 'acceptedCount', 'checkedInVolunteers'));
     }
 
     public function createEvent()

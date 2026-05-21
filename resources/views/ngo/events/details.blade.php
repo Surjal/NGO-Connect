@@ -132,7 +132,6 @@
                             <div class="bg-white p-6 rounded-3xl border border-gray-100 shadow-sm flex flex-col items-center gap-4">
                                 @if($event->check_in_token)
                                     <div class="p-4 bg-white rounded-2xl border-2 border-dashed border-red-100 relative group">
-                                        {{-- Use CDN QR Generator as fallback --}}
                                         <img src="https://api.qrserver.com/v1/create-qr-code/?size=150x150&data={{ urlencode(route('people.event.checkin', $event->check_in_token)) }}" 
                                              alt="Check-in QR Code" 
                                              class="w-40 h-40">
@@ -148,6 +147,67 @@
                                     </div>
                                     <p class="text-[10px] text-red-500 font-bold text-center leading-tight">Please Edit & Save the event<br>to regenerate the QR code.</p>
                                 @endif
+                            </div>
+                        </div>
+
+                        <!-- Check-in Progress & Volunteer List -->
+                        <div class="mt-8">
+                            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm p-6">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h4 class="text-sm font-bold text-gray-900 flex items-center gap-2">
+                                        <span class="iconify text-green-600" data-icon="fluent:people-checkmark-20-filled"></span>
+                                        Check-in Progress
+                                    </h4>
+                                    <span class="text-xs font-bold text-gray-500">{{ $checkedInCount }} / {{ $acceptedCount }} checked in</span>
+                                </div>
+
+                                <button onclick="document.getElementById('checkedInList').classList.toggle('hidden')" class="w-full group cursor-pointer">
+                                    <div class="w-full bg-gray-100 rounded-full h-3 overflow-hidden">
+                                        <div class="bg-green-500 h-3 rounded-full transition-all duration-500 group-hover:bg-green-600"
+                                             style="width: {{ $acceptedCount > 0 ? ($checkedInCount / $acceptedCount) * 100 : 0 }}%">
+                                        </div>
+                                    </div>
+                                    <p class="text-[10px] text-gray-400 font-bold text-right mt-1.5 group-hover:text-gray-600 transition-colors">
+                                        Click to {{ $checkedInVolunteers->isEmpty() ? '' : 'toggle' }} details
+                                    </p>
+                                </button>
+
+                                <div id="checkedInList" class="hidden mt-6 border-t border-gray-100 pt-4">
+                                    @if($checkedInVolunteers->isNotEmpty())
+                                        <div class="overflow-x-auto">
+                                            <table class="w-full text-sm">
+                                                <thead>
+                                                    <tr class="text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-100">
+                                                        <th class="text-left pb-3 pr-2">#</th>
+                                                        <th class="text-left pb-3 pr-2">Volunteer</th>
+                                                        <th class="text-left pb-3">Checked in at</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-gray-50">
+                                                    @foreach($checkedInVolunteers as $index => $volunteer)
+                                                        <tr class="hover:bg-gray-50 transition-colors">
+                                                            <td class="py-3 pr-2 text-gray-400 font-bold text-xs">{{ $index + 1 }}</td>
+                                                            <td class="py-3 pr-2">
+                                                                <p class="font-bold text-gray-900">{{ $volunteer['name'] }}</p>
+                                                                <p class="text-[11px] text-gray-400">{{ $volunteer['email'] }}</p>
+                                                            </td>
+                                                            <td class="py-3">
+                                                                <span class="text-xs text-gray-600 font-medium">
+                                                                    {{ $volunteer['checked_in_at'] ? \Carbon\Carbon::parse($volunteer['checked_in_at'])->format('M d, h:i A') : '-' }}
+                                                                </span>
+                                                            </td>
+                                                        </tr>
+                                                    @endforeach
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    @else
+                                        <div class="text-center py-6">
+                                            <span class="iconify text-2xl text-gray-200 mb-2" data-icon="fluent:people-20-regular"></span>
+                                            <p class="text-sm text-gray-400 font-bold">No volunteers checked in yet.</p>
+                                        </div>
+                                    @endif
+                                </div>
                             </div>
                         </div>
                     </div>

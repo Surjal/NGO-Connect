@@ -55,6 +55,7 @@ class Event extends Model
         'start_date' => 'datetime',
         'end_date' => 'datetime',
         'is_volunteers_required' => 'boolean',
+        'type' => 'integer',
     ];
 
     public function user()

@@ -69,10 +69,6 @@
                     <p class="text-gray-900">{{ $ngo->events()->count() }}</p>
                 </div>
                 <div>
-                    <p class="text-sm text-gray-500">Total Donations Raised</p>
-                    <p class="text-gray-900">Nrs. {{ number_format($ngo->donations()->sum('donation_amount'), 2) }}</p>
-                </div>
-                <div>
                     <p class="text-sm text-gray-500">Total Followers</p>
                     <p class="text-gray-900">{{ $ngo->followers()->count() }}</p>
                 </div>

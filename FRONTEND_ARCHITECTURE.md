@@ -164,7 +164,7 @@ Desktop: 1024px+   (lg)
 
 #### **Semantic Colors**
 
-- **Success:** `#10b981` (emerald-500) — Donations, completed status
+- **Success:** `#10b981` (emerald-500) — Completed status
 - **Warning:** `#f59e0b` (amber-500) — Milestones, alerts
 - **Error:** `#ef4444` (red-500) — Flags, reports
 - **Info:** `#3b82f6` (blue-500) — Messages, notifications

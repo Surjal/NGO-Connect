@@ -110,7 +110,7 @@
                     </div>
                 </div>
                 <h3 class="text-xl font-black text-slate-900 mb-4">3. Impact</h3>
-                <p class="text-slate-500 leading-relaxed font-medium">Volunteer for events, donate securely via eSewa, and earn badges as you contribute to positive global change.</p>
+                <p class="text-slate-500 leading-relaxed font-medium">Volunteer for events, and earn badges as you contribute to positive global change.</p>
             </div>
         </div>
     </section>

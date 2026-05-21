@@ -35,19 +35,6 @@
                 </div>
             </div>
 
-            {{-- <!-- Donations -->
-            <div
-                class="glass-panel p-6 flex items-center justify-between group hover:shadow-lg transition-all duration-300">
-                <div>
-                    <p class="text-xs font-bold text-gray-400 uppercase tracking-wider">Donations</p>
-                    <p class="text-3xl font-black text-gray-900 mt-2">${{ number_format($totalDonations) }}</p>
-                </div>
-                <div
-                    class="w-14 h-14 rounded-2xl bg-red-50 text-red-600 flex items-center justify-center text-2xl group-hover:scale-110 transition-transform">
-                    <i class="fas fa-hand-holding-heart"></i>
-                </div>
-            </div> --}}
-
             <!-- Pending Approvals -->
             <div
                 class="glass-panel p-6 flex items-center justify-between relative overflow-hidden group hover:shadow-lg transition-all duration-300">
@@ -133,19 +120,6 @@
                                 </div>
                             </div>
                             <span class="text-xs font-bold text-emerald-500">+1 User</span>
-                        </div>
-                        <div class="flex items-center justify-between py-3 border-b border-gray-50 last:border-0">
-                            <div class="flex items-center gap-3">
-                                <div
-                                    class="w-8 h-8 rounded-full bg-red-50 flex items-center justify-center text-red-500 text-xs">
-                                    <i class="fas fa-hand-holding-heart"></i>
-                                </div>
-                                <div>
-                                    <p class="text-sm font-bold text-gray-900">Donation Processed</p>
-                                    <p class="text-xs text-gray-500">45 minutes ago</p>
-                                </div>
-                            </div>
-                            <span class="text-xs font-bold text-gray-500">View</span>
                         </div>
                     </div>
                 </div>

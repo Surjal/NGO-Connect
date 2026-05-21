@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Notifications\NgoRegistrationApproved;
 use App\Notifications\NgoRegistrationRejected;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class UserController extends Controller
 {
@@ -85,6 +87,53 @@ class UserController extends Controller
         }
 
         return response()->json(['message' => 'User registration rejected and deleted.']);
+    }
+
+    public function index(Request $request)
+    {
+        $users = User::paginate(10);
+        return view('admin.user.index', compact('users'));
+    }
+
+    public function store(Request $request)
+    {
+        $validated = $request->validate([
+            'name'      => 'required|string|max:255',
+            'email'     => 'required|email|unique:users,email',
+            'password'  => 'required|min:6',
+            'phone'     => 'nullable|string|max:20',
+            'role_id'   => 'required|integer|in:0,1,2',
+            'profile_photo' => 'nullable|image|max:2048',
+            'verified'  => 'nullable|boolean',
+        ]);
+
+        if ($request->hasFile('profile_photo')) {
+            $validated['profile_photo'] = $request->file('profile_photo')->store('profile_photos', 'public');
+        }
+
+        $validated['password'] = Hash::make($validated['password']);
+        $validated['verified'] = $request->has('verified');
+
+        User::create($validated);
+
+        return redirect()
+            ->route('admin.users')
+            ->with('success', 'User created successfully!');
+    }
+
+    public function destroy($id)
+    {
+        $user = User::findOrFail($id);
+
+        if ($user->profile_photo && Storage::disk('public')->exists($user->profile_photo)) {
+            Storage::disk('public')->delete($user->profile_photo);
+        }
+
+        $user->delete();
+
+        return redirect()
+            ->route('admin.users')
+            ->with('success', 'User deleted successfully!');
     }
 
     /**

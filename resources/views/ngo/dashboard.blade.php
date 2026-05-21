@@ -54,19 +54,6 @@
             </div>
         </div>
 
-        <!-- Donations Stat -->
-        <div class="glass-panel px-5 py-4 flex items-center gap-4 group hover:border-emerald-200 transition-all duration-300">
-            <div class="w-12 h-12 bg-emerald-50 rounded-xl flex items-center justify-center text-emerald-500 shadow-sm group-hover:scale-110 transition-transform flex-shrink-0">
-                <span class="iconify text-2xl" data-icon="fluent:money-hand-24-filled"></span>
-            </div>
-            <div class="min-w-0 flex-1">
-                <span class="block text-[10px] font-black text-slate-400 uppercase tracking-widest mb-0.5 truncate">Donations</span>
-                 <div class="flex items-baseline gap-0.5" title="Rs. {{ number_format($totalDonations) }}">
-                    <span class="text-xs font-bold text-slate-500">Rs.</span>
-                    <span class="text-lg lg:text-xl font-black text-slate-900 break-all leading-none">{{ number_format($totalDonations) }}</span>
-                </div>
-            </div>
-        </div>
     </div>
 
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -148,38 +135,8 @@
             </div>
         </div>
 
-        <!-- Right Column: Recent Donations & Quick Links -->
+        <!-- Right Column: Quick Navigation -->
         <div class="space-y-6">
-            <!-- Recent Donations Card -->
-            <div class="glass-panel overflow-hidden">
-                <div class="p-6 border-b border-slate-100 bg-emerald-50/30">
-                    <h2 class="text-lg font-black text-slate-900 tracking-tight">Recent Donations</h2>
-                </div>
-                <div class="divide-y divide-slate-100">
-                    @forelse($recentDonations as $donation)
-                        <div class="p-5 flex items-start justify-between group hover:bg-slate-50 transition-colors">
-                            <div class="flex items-center gap-3">
-                                <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 group-hover:bg-emerald-100 group-hover:text-emerald-600 transition-colors">
-                                    <i class="fas fa-user text-xs"></i>
-                                </div>
-                                <div>
-                                    <h4 class="text-sm font-bold text-slate-900">{{ $donation->user->name }}</h4>
-                                    <p class="text-[10px] font-medium text-slate-400 mt-0.5">{{ $donation->created_at->format('M d, h:i A') }}</p>
-                                </div>
-                            </div>
-                            <span class="text-sm font-black text-emerald-600">Rs.{{ number_format($donation->donation_amount) }}</span>
-                        </div>
-                    @empty
-                        <div class="p-8 text-center text-slate-400">
-                            <p class="text-xs font-medium">No recent donations.</p>
-                        </div>
-                    @endforelse
-                </div>
-                <div class="p-4 bg-slate-50/50 border-t border-slate-100">
-                    <a href="{{ route('ngo.donations') }}" class="block text-center text-xs font-black text-slate-500 uppercase tracking-widest hover:text-primary transition-colors">View All History</a>
-                </div>
-            </div>
-
             <!-- Quick Navigation Card -->
             <div class="glass-panel p-6">
                 <h2 class="text-lg font-black text-slate-900 tracking-tight mb-6">Quick Actions</h2>

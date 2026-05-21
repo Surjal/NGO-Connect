@@ -53,8 +53,4 @@ class Ngo extends Model
         return $this->hasMany(Event::class, 'user_id');
     }
 
-    public function donations()
-    {
-        return $this->hasMany(Donation::class, 'ngo_id', 'user_id');
-    }
 }

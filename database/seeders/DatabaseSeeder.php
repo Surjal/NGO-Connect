@@ -30,7 +30,6 @@ class DatabaseSeeder extends Seeder
             PostHasLikesSeeder::class,
             PostHasCommentsSeeder::class,
             PostHasReportsSeeder::class,
-            DonationSeeder::class,
         ]);
     }
 }

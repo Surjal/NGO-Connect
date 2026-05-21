@@ -17,17 +17,12 @@ class ProfileController extends Controller
             'volunteeredEvents' => function($query) {
                 $query->latest()->limit(5);
             },
-            'donations' => function($query) {
-                $query->with('ngo')->latest()->limit(5);
-            },
             'certificates.event',
             'badges'
         ]);
         
         $stats = [
             'volunteering_count' => $user->volunteeredEvents()->wherePivot('status', 'accepted')->count(),
-            'donations_count' => $user->donations()->count(),
-            'total_donated' => $user->donations()->sum('donation_amount'),
         ];
 
         return view('people.profile.show', compact('user', 'stats'));

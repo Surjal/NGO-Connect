@@ -141,8 +141,8 @@ class NgoController extends Controller
     }
     public function suspend(Request $request, $id)
     {
-        $ngo = User::where('role_id', 1)->where('id', $id)->first();
-        $ngo = Ngo::where('user_id', $ngo->id)->first();
+        $ngoUser = User::where('role_id', 1)->where('id', $id)->firstOrFail();
+        $ngo = Ngo::where('user_id', $ngoUser->id)->firstOrFail();
         if ($ngo->suspended) {
             $ngo->update([
                 'suspended' => false,

@@ -86,7 +86,7 @@
                     </div>
                     <span class="block text-xs font-medium uppercase tracking-wide text-gray-400">Impact Points</span>
                     <h3 class="mt-3 text-3xl font-bold tracking-tight text-red-600">
-                        {{ $stats['volunteering_count'] * 100 + (int) ($stats['total_donated'] / 10) }}
+                        {{ $stats['volunteering_count'] * 100 }}
                     </h3>
                     <p class="mt-1 text-xs text-gray-400">Top 5% Contributor</p>
                 </div>
@@ -199,7 +199,7 @@
 
                     <!-- Panel: Activity -->
                     <div id="tab-panel-activity" class="tab-panel space-y-4">
-                        @if ($user->volunteeredEvents->isEmpty() && $user->donations->isEmpty())
+                        @if ($user->volunteeredEvents->isEmpty())
                             <div class="rounded-2xl border border-gray-100 bg-white p-12 text-center">
                                 <div
                                     class="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-slate-50 text-slate-200">
@@ -240,29 +240,7 @@
                                 </div>
                             @endforeach
 
-                            {{-- Donation Timeline --}}
-                            @if ($user->donations->isNotEmpty())
-                                <p
-                                    class="mb-3 mt-5 border-b border-gray-100 pb-2 text-xs font-semibold uppercase tracking-widest text-gray-400">
-                                    Donations</p>
-                            @endif
-                            @foreach ($user->donations as $donation)
-                                <div class="flex items-center gap-3 rounded-2xl border border-gray-100 bg-white p-4">
-                                    <div
-                                        class="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-green-50 text-green-600">
-                                        <span class="iconify text-xl" data-icon="fluent:money-hand-24-filled"></span>
-                                    </div>
-                                    <div class="min-w-0 flex-1">
-                                        <h5 class="text-sm font-semibold text-gray-900">Donated
-                                            Rs.{{ number_format($donation->donation_amount) }}</h5>
-                                        <div class="mt-1 flex flex-wrap items-center gap-2 text-xs text-gray-400">
-                                            <span>to {{ $donation->ngo->name }}</span>
-                                            <span
-                                                class="rounded-full bg-green-50 px-2 py-0.5 font-medium text-green-700">{{ $donation->created_at->format('M d, Y') }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
+
                         @endif
                     </div>
 

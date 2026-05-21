@@ -4,7 +4,6 @@ namespace App\Http\Controllers\Admin;
 
 use App\Models\Ngo;
 use App\Models\User;
-use App\Models\Donation;
 use Illuminate\Http\Request;
 use App\Models\PostHasReports;
 use App\Http\Controllers\Controller;
@@ -21,7 +20,6 @@ class DashboardController extends Controller
         $userCount = User::where('role_id',2)->count();
         $pendingNgoApprovals = Ngo::where('verified',0)->count();
         $reportedPosts = PostHasReports::count();
-        $totalDonations = Donation::sum('donation_amount');
-        return view('admin.dashboard',compact('ngoCount','userCount','pendingNgoApprovals','reportedPosts','totalDonations'));
+        return view('admin.dashboard',compact('ngoCount','userCount','pendingNgoApprovals','reportedPosts'));
     }
 }

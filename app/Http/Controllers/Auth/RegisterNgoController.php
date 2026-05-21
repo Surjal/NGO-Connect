@@ -55,8 +55,7 @@ class RegisterNgoController extends Controller
         }
 
         try {
-            // Start a database transaction
-            $result = DB::transaction(function () use ($request) {
+            DB::transaction(function () use ($request) {
                 // Handle logo upload
                 $logoPath = null;
                 if ($request->hasFile('logo')) {
@@ -111,8 +110,7 @@ class RegisterNgoController extends Controller
                     'logo' => $logoPath,
                 ]);
 
-                // Send welcome email to contact person with NGO details
-                // Mail::to($contactUser->email)->send(new WelcomeMail($contactUser, $ngo));
+                Mail::to($contactUser->email)->send(new WelcomeMail($contactUser, $ngo));
 
                 // return [
                 //     'contact_user' => $contactUser,

@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Ngo;
 
 use App\Http\Controllers\Controller;
-use App\Models\Donation;
 use App\Models\Event;
 use App\Models\Follows;
 use App\Models\Post;
@@ -20,9 +19,7 @@ class DashboardController extends Controller
         // Stats
         $totalEvents = Event::where('user_id', $ngoUserId)->count();
         $totalFollowers = Follows::where('ngo_id', $ngoUserId)->count();
-        $totalDonations = Donation::where('ngo_id', $ngoUserId)
-            ->sum('donation_amount');
-            
+
         $totalVolunteers = DB::table('event_has_volunteers')
             ->join('events', 'event_has_volunteers.event_id', '=', 'events.id')
             ->where('events.user_id', $ngoUserId)
@@ -33,12 +30,6 @@ class DashboardController extends Controller
             ->where('start_date', '>', now())
             ->orderBy('start_date', 'asc')
             ->take(3)
-            ->get();
-
-        $recentDonations = Donation::with('user')
-            ->where('ngo_id', $ngoUserId)
-            ->orderBy('created_at', 'desc')
-            ->take(5)
             ->get();
 
         $recentPosts = Post::where('user_id', $ngoUserId)
@@ -56,10 +47,8 @@ class DashboardController extends Controller
         return view('ngo.dashboard', compact(
             'totalEvents', 
             'totalFollowers', 
-            'totalDonations', 
             'totalVolunteers',
             'upcomingEvents',
-            'recentDonations',
             'recentPosts',
             'milestones',
             'churnData'

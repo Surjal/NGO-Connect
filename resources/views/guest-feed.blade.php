@@ -81,12 +81,6 @@
                                     </div>
                                     <span class="font-bold text-sm">Events</span>
                                 </a>
-                                <a href="{{ route('login') }}" class="flex items-center space-x-3 px-3 py-2.5 rounded-xl text-slate-600 hover:bg-white hover:shadow-sm transition-all group">
-                                    <div class="w-8 h-8 bg-red-50 rounded-lg flex items-center justify-center group-hover:rotate-6 transition-all">
-                                        <i class="fas fa-heart text-red-500 text-sm"></i>
-                                    </div>
-                                    <span class="font-bold text-sm">Donate</span>
-                                </a>
                             </div>
                         </div>
 
