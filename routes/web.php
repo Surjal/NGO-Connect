@@ -138,6 +138,10 @@ Route::middleware(['auth', 'check.verified'])->group(function () {
 
         // QR Check-in Route
         Route::get('/event/check-in/{token}', [People\AttendanceController::class, 'checkIn'])->name('people.event.checkin');
+
+        // Certificate Download Route
+        Route::get('/certificate/{certificateId}/download', [People\ProfileController::class, 'downloadCertificate'])
+            ->name('people.certificate.download');
     });
 
     // Shared routes (ngo and people, role_id=1,2)

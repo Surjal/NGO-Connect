@@ -12,16 +12,28 @@ class MilestoneController extends Controller
 {
     public function store(Request $request, $eventId)
     {
+        \Log::info('Milestone Store Method Called', [
+            'eventId' => $eventId,
+            'request_data' => $request->all(),
+            'user_id' => Auth::id()
+        ]);
+
         $event = Event::findOrFail($eventId);
         
         if ($event->user_id !== Auth::id()) {
+            \Log::warning('Unauthorized milestone creation attempt', [
+                'event_user_id' => $event->user_id,
+                'auth_user_id' => Auth::id()
+            ]);
             return response()->json(['error' => 'Unauthorized'], 403);
         }
 
-        $request->validate([
+        $validated = $request->validate([
             'title' => 'required|string|max:255',
             'description' => 'nullable|string',
         ]);
+
+        \Log::info('Validation passed', ['validated' => $validated]);
 
         $milestone = $event->milestones()->create([
             'title' => $request->title,
@@ -30,7 +42,9 @@ class MilestoneController extends Controller
             'order' => $event->milestones()->count() + 1,
         ]);
 
-        return back()->with('success', 'Milestone added successfully.');
+        \Log::info('Milestone created successfully', ['milestone_id' => $milestone->id]);
+
+        return redirect()->route('ngo.event.details', $event->id)->with('success', 'Milestone added successfully.');
     }
 
     public function updateStatus(Request $request, $milestoneId)

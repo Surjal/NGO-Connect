@@ -101,7 +101,7 @@
                                 <div class="mt-auto grid {{ $event->is_volunteers_required ? 'grid-cols-2' : 'grid-cols-1' }} gap-2">
                                     @if($event->is_volunteers_required)
                                         <button type="button"
-                                            class="w-full font-black py-2.5 rounded-xl shadow-sm transition-all duration-300 uppercase tracking-wider text-[10px] bg-purple-600 hover:bg-purple-700 text-white"
+                                            class="w-full font-black py-2.5 rounded-xl shadow-sm transition-all duration-300 uppercase tracking-wider text-[10px] bg-purple-600 hover:bg-red-700 text-white"
                                             data-event-id="{{ $event->id }}">
                                             Apply Now
                                         </button>

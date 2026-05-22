@@ -318,9 +318,11 @@
                                         <p class="mt-0.5 text-xs text-gray-400">
                                             {{ $certificate->issued_at->format('M Y') }}</p>
                                     </div>
-                                    <button class="text-gray-400 transition-colors duration-200 hover:text-red-500">
+                                    <a href="{{ route('people.certificate.download', $certificate->id) }}"
+                                       class="text-gray-400 transition-colors duration-200 hover:text-red-500"
+                                       target="_blank">
                                         <span class="iconify text-lg" data-icon="fluent:arrow-download-24-filled"></span>
-                                    </button>
+                                    </a>
                                 </div>
                             @empty
                                 <div class="text-center py-8 text-slate-400">

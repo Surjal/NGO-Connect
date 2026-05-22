@@ -4,6 +4,8 @@ namespace App\Http\Controllers\People;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\ComputeUserRecommendations;
+use App\Models\Certificate;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -64,5 +66,26 @@ class ProfileController extends Controller
         }
 
         return redirect()->route('people.profile')->with('success', 'Profile updated successfully.');
+    }
+
+    public function downloadCertificate($certificateId)
+    {
+        $certificate = Certificate::with(['user', 'event.ngo', 'event.user'])->findOrFail($certificateId);
+
+        if ($certificate->user_id !== Auth::id()) {
+            abort(403, 'Unauthorized access to certificate.');
+        }
+
+        $ngoName = $certificate->event->ngo?->ngo_name ?? $certificate->event->user->name ?? 'NGO';
+
+        $pdf = Pdf::loadView('people.profile.certificate-pdf', [
+            'certificate' => $certificate,
+            'ngoName' => $ngoName,
+        ]);
+
+        $filename = 'certificate-' . $certificate->event->title . '-' . $certificate->user->name . '.pdf';
+        $filename = preg_replace('/[^a-zA-Z0-9\-_\. ]/', '', $filename);
+
+        return $pdf->download($filename);
     }
 }

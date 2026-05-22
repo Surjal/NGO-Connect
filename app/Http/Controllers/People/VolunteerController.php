@@ -120,6 +120,7 @@ class VolunteerController extends Controller
     {
         $userId = Auth::id();
         $event = Event::where('id', $id)
+            ->with('milestones')
             ->withExists(['volunteers as is_registered' => function ($query) use ($userId) {
                 $query->where('user_id', $userId);
             }])

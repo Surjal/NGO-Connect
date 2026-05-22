@@ -2,6 +2,36 @@
 @section('content')
     <div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-8">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            
+            <!-- Success/Error Messages -->
+            @if(session('success'))
+                <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-xl flex items-center gap-3">
+                    <span class="iconify text-green-600" data-icon="fluent:checkmark-circle-20-filled"></span>
+                    <p class="text-sm font-bold text-green-800">{{ session('success') }}</p>
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl flex items-center gap-3">
+                    <span class="iconify text-red-600" data-icon="fluent:error-circle-20-filled"></span>
+                    <p class="text-sm font-bold text-red-800">{{ session('error') }}</p>
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div class="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl">
+                    <div class="flex items-center gap-3 mb-2">
+                        <span class="iconify text-red-600" data-icon="fluent:error-circle-20-filled"></span>
+                        <p class="text-sm font-bold text-red-800">Please fix the following errors:</p>
+                    </div>
+                    <ul class="ml-8 list-disc text-sm text-red-700">
+                        @foreach($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            @endif
+
             <div class="mb-8">
                 <a href="{{ route('ngo.events') }}"
                     class="inline-flex items-center text-red-500 hover:text-red-700 font-semibold transition-colors">
@@ -241,7 +271,7 @@
                                 <span class="iconify text-orange-500" data-icon="fluent:board-20-filled"></span>
                                 Project Milestones
                             </h3>
-                            <button onclick="document.getElementById('addMilestoneModal').classList.remove('hidden')" 
+                            <button type="button" onclick="document.getElementById('addMilestoneModal').classList.remove('hidden')" 
                                     class="text-xs font-black text-red-600 uppercase tracking-widest hover:text-red-700 transition-colors flex items-center gap-1">
                                 <span class="iconify" data-icon="fluent:add-circle-20-filled"></span>
                                 Add Milestone
@@ -302,7 +332,7 @@
                             <div class="bg-gray-50/50 border border-dashed border-gray-100 rounded-3xl p-8 text-center">
                                 <span class="iconify text-3xl text-gray-200 mx-auto mb-3" data-icon="fluent:board-20-regular"></span>
                                 <p class="text-sm text-gray-400 font-bold mb-4">No milestones defined yet.</p>
-                                <button onclick="document.getElementById('addMilestoneModal').classList.remove('hidden')" 
+                                <button type="button" onclick="document.getElementById('addMilestoneModal').classList.remove('hidden')" 
                                         class="px-5 py-2 bg-white border border-gray-200 text-gray-600 text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-gray-50 transition-all">
                                     Define First Phase
                                 </button>
@@ -313,9 +343,14 @@
                     <!-- Milestone Modal -->
                     <div id="addMilestoneModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
                         <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" onclick="document.getElementById('addMilestoneModal').classList.add('hidden')"></div>
+                            <!-- Background overlay -->
+                            <div class="fixed inset-0 bg-gray-900 bg-opacity-75 transition-opacity" onclick="document.getElementById('addMilestoneModal').classList.add('hidden')" aria-hidden="true"></div>
+                            
+                            <!-- Center modal -->
                             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                            <div class="inline-block align-bottom bg-white rounded-[2rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100">
+                            
+                            <!-- Modal panel -->
+                            <div class="inline-block align-bottom bg-white rounded-[2rem] text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full border border-gray-100 relative z-10">
                                 <form action="{{ route('ngo.milestones.store', $event->id) }}" method="POST" class="p-8">
                                     @csrf
                                     <div class="mb-6">
@@ -326,12 +361,13 @@
                                         <div>
                                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Milestone Title</label>
                                             <input type="text" name="title" required placeholder="e.g., Procurement of Materials" 
-                                                   class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all font-bold text-gray-800 placeholder-gray-300">
+                                                   class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all font-bold text-gray-800 placeholder-gray-300"
+                                                   value="{{ old('title') }}">
                                         </div>
                                         <div>
                                             <label class="block text-[10px] font-black text-gray-400 uppercase tracking-widest mb-2 ml-1">Detail (Optional)</label>
                                             <textarea name="description" rows="3" placeholder="Briefly describe what this phase involves..." 
-                                                      class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all font-medium text-gray-800 placeholder-gray-300"></textarea>
+                                                      class="w-full px-5 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-all font-medium text-gray-800 placeholder-gray-300">{{ old('description') }}</textarea>
                                         </div>
                                     </div>
                                     <div class="mt-8 flex gap-3">
@@ -378,4 +414,31 @@
         </div>
     </div>
     <script src="https://code.iconify.design/iconify-icon/1.0.8/iconify-icon.min.js"></script>
+    <script>
+        // Debug function to test modal
+        function testModal() {
+            const modal = document.getElementById('addMilestoneModal');
+            console.log('Modal element:', modal);
+            console.log('Modal classes:', modal?.className);
+            if (modal) {
+                modal.classList.remove('hidden');
+                console.log('Modal should now be visible');
+            } else {
+                console.error('Modal not found!');
+            }
+        }
+
+        // Auto-close modal on page load if there's a success message (after redirect)
+        @if(session('success'))
+            document.getElementById('addMilestoneModal')?.classList.add('hidden');
+        @endif
+
+        // Show validation errors in modal if present
+        @if($errors->any())
+            document.getElementById('addMilestoneModal')?.classList.remove('hidden');
+        @endif
+
+        // Test on page load
+        console.log('Page loaded. Modal element:', document.getElementById('addMilestoneModal'));
+    </script>
 @endsection

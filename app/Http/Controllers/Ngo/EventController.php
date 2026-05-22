@@ -54,7 +54,7 @@ class EventController extends Controller
 
     public function showEventDetails($id)
     {
-        $event = Event::with(['attendances.user', 'volunteers'])->findOrFail($id);
+        $event = Event::with(['attendances.user', 'volunteers', 'milestones'])->findOrFail($id);
         $currentDate = now();
         if ($event->end_date && $event->end_date < $currentDate) {
             $event['timing'] = 'old';
